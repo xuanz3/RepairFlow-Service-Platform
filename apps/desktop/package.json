@@ -1,0 +1,19 @@
+{
+  "name": "@repairflow/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "build": "vite build && tsc -p electron/tsconfig.json",
+    "dev": "concurrently -k \"vite --host 127.0.0.1\" \"wait-on tcp:5173 && cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:5173 electron .\"",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p electron/tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@repairflow/api-client": "workspace:*",
+    "@repairflow/contracts": "workspace:*",
+    "@repairflow/design-tokens": "workspace:*"
+  },
+  "devDependencies": {}
+}
