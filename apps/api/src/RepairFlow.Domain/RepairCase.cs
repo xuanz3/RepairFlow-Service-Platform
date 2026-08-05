@@ -2,8 +2,8 @@ namespace RepairFlow.Domain;
 
 public sealed class RepairCase
 {
-    private static readonly IReadOnlyDictionary<RepairCaseStatus, RepairCaseStatus[]> AllowedTransitions =
-        new Dictionary<RepairCaseStatus, RepairCaseStatus[]>
+    private static readonly Dictionary<RepairCaseStatus, RepairCaseStatus[]> AllowedTransitions =
+        new()
         {
             [RepairCaseStatus.CheckedIn] = [RepairCaseStatus.Diagnosing, RepairCaseStatus.Cancelled],
             [RepairCaseStatus.Diagnosing] = [RepairCaseStatus.AwaitingApproval, RepairCaseStatus.InRepair, RepairCaseStatus.Cancelled],
