@@ -7,8 +7,20 @@ export interface QueueItem {
 }
 
 export const queueItems: QueueItem[] = [
-  { reference: 'RF-2608-0001', manufacturer: 'Orion Devices', model: 'Notebook 14', category: 'Laptop', status: 'diagnosing' },
-  { reference: 'RF-2608-0002', manufacturer: 'Northstar', model: 'Slate Pro', category: 'Tablet', status: 'quality check' },
+  {
+    reference: 'RF-2608-0001',
+    manufacturer: 'Orion Devices',
+    model: 'Notebook 14',
+    category: 'Laptop',
+    status: 'diagnosing',
+  },
+  {
+    reference: 'RF-2608-0002',
+    manufacturer: 'Northstar',
+    model: 'Slate Pro',
+    category: 'Tablet',
+    status: 'quality check',
+  },
 ];
 
 export function queueSummary(items: QueueItem[]): string {

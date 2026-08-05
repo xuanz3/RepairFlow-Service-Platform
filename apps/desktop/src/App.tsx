@@ -49,7 +49,9 @@ export function App() {
             <p>{countOpenCases(repairCases)} active cases across intake, repair and quality.</p>
           </div>
           <div className="header-actions">
-            <button className="secondary-button">Search <kbd>⌘K</kbd></button>
+            <button className="secondary-button">
+              Search <kbd>⌘K</kbd>
+            </button>
             <button className="primary-button">New intake</button>
           </div>
         </header>
@@ -93,14 +95,31 @@ export function App() {
                 <h2>{selected.device.model}</h2>
                 <p className="reference">{selected.reference}</p>
                 <dl>
-                  <div><dt>Customer</dt><dd>{selected.customerDisplayName}</dd></div>
-                  <div><dt>Device</dt><dd>{selected.device.manufacturer} {selected.device.model}</dd></div>
-                  <div><dt>Serial</dt><dd>{selected.device.serialNumberMasked}</dd></div>
-                  <div><dt>Priority</dt><dd>{selected.priority}</dd></div>
+                  <div>
+                    <dt>Customer</dt>
+                    <dd>{selected.customerDisplayName}</dd>
+                  </div>
+                  <div>
+                    <dt>Device</dt>
+                    <dd>
+                      {selected.device.manufacturer} {selected.device.model}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Serial</dt>
+                    <dd>{selected.device.serialNumberMasked}</dd>
+                  </div>
+                  <div>
+                    <dt>Priority</dt>
+                    <dd>{selected.priority}</dd>
+                  </div>
                 </dl>
                 <div className="inspector-note">
                   <span>Reported fault</span>
-                  <p>Generated demonstration case. Diagnostic notes and evidence will be connected in Phase 2.</p>
+                  <p>
+                    Generated demonstration case. Diagnostic notes and evidence will be connected in
+                    Phase 2.
+                  </p>
                 </div>
                 <button className="primary-button full-width">Open repair case</button>
               </motion.aside>
@@ -135,12 +154,15 @@ function CaseRow({
     <button className={selected ? 'case-row selected' : 'case-row'} onClick={onSelect}>
       <div className="device-icon">{repairCase.device.category.slice(0, 1)}</div>
       <div className="case-primary">
-        <strong>{repairCase.device.manufacturer} {repairCase.device.model}</strong>
-        <span>{repairCase.reference} · {repairCase.customerDisplayName}</span>
+        <strong>
+          {repairCase.device.manufacturer} {repairCase.device.model}
+        </strong>
+        <span>
+          {repairCase.reference} · {repairCase.customerDisplayName}
+        </span>
       </div>
       <span className={`status status-${repairCase.status}`}>{repairCase.status}</span>
       <span className="priority">{repairCase.priority}</span>
     </button>
   );
 }
-

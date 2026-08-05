@@ -9,17 +9,19 @@ RepairFlow is an offline-first repair operations platform for electronics servic
 `Check-in → condition evidence → diagnosis → repair work → quality verification → delivery`
 
 <!-- product-media:start -->
+
 Product media will be inserted here by the validated capture pipeline in Phase 4.
+
 <!-- product-media:end -->
 
 ## Platform
 
-| Component | Responsibility |
-|---|---|
-| Mobile | Device check-in, QR lookup, condition evidence, diagnosis steps and offline queue visibility |
-| Desktop | Workshop queue, repair case inspection, evidence comparison, quality verification and diagnostics |
-| Service | Identity, roles, repair workflow rules, PostgreSQL persistence, audit records and OpenAPI |
-| Local infrastructure | PostgreSQL and Azurite through Docker Compose |
+| Component            | Responsibility                                                                                    |
+| -------------------- | ------------------------------------------------------------------------------------------------- |
+| Mobile               | Device check-in, QR lookup, condition evidence, diagnosis steps and offline queue visibility      |
+| Desktop              | Workshop queue, repair case inspection, evidence comparison, quality verification and diagnostics |
+| Service              | Identity, roles, repair workflow rules, PostgreSQL persistence, audit records and OpenAPI         |
+| Local infrastructure | PostgreSQL and Azurite through Docker Compose                                                     |
 
 ## Technology
 
@@ -80,13 +82,13 @@ All example customers, devices, serial numbers and attachments are fictional or 
 
 ## Delivery stages
 
-| Stage | Purpose | Status |
-|---|---|---|
-| Phase 0 | Product definition, design direction and repository governance | Complete |
-| Phase 1 | Platform foundation, backend, identity and shared contracts | Complete |
-| Phase 2 | Desktop and mobile repair workflows | Planned |
-| Phase 3 | Offline synchronisation, reliability, security and observability | Planned |
-| Phase 4 | Packaging, automated product media and the v1.0 release | Planned |
+| Stage   | Purpose                                                          | Status   |
+| ------- | ---------------------------------------------------------------- | -------- |
+| Phase 0 | Product definition, design direction and repository governance   | Complete |
+| Phase 1 | Platform foundation, backend, identity and shared contracts      | Complete |
+| Phase 2 | Desktop and mobile repair workflows                              | Planned  |
+| Phase 3 | Offline synchronisation, reliability, security and observability | Planned  |
+| Phase 4 | Packaging, automated product media and the v1.0 release          | Planned  |
 
 ## Licence
 
