@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "RepairFlow",
+    "slug": "repairflow-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "repairflow",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "plugins": ["expo-router", "expo-secure-store"],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.xuanz3.repairflow.mobile"
+    },
+    "android": {
+      "package": "com.xuanz3.repairflow.mobile"
+    }
+  }
+}

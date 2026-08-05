@@ -1,0 +1,20 @@
+{
+  "name": "@repairflow/mobile",
+  "version": "0.1.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "android": "expo start --android",
+    "build": "tsc -p tsconfig.json --noEmit",
+    "dev": "expo start --dev-client",
+    "ios": "expo start --ios",
+    "start": "expo start",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@repairflow/contracts": "workspace:*",
+    "@repairflow/design-tokens": "workspace:*"
+  },
+  "devDependencies": {}
+}
