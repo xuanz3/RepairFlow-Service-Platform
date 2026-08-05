@@ -12,6 +12,7 @@ node_modules/
 .pnpm-store/
 .turbo/
 dist/
+apps/desktop/dist-electron/
 coverage/
 *.tsbuildinfo
 
