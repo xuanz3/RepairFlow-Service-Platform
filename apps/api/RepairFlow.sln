@@ -1,0 +1,48 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepairFlow.Domain", "src\RepairFlow.Domain\RepairFlow.Domain.csproj", "{D8F922D0-5E42-4AE1-9134-79E2B23ECDA1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepairFlow.Application", "src\RepairFlow.Application\RepairFlow.Application.csproj", "{51D63838-2F08-445A-A1B2-93F18631D711}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepairFlow.Infrastructure", "src\RepairFlow.Infrastructure\RepairFlow.Infrastructure.csproj", "{F40FB72D-CBD3-45AB-91F0-8FBCC66811A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepairFlow.Api", "src\RepairFlow.Api\RepairFlow.Api.csproj", "{61C854B2-75D0-4D3B-A891-3BB3B16766A8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepairFlow.Domain.Tests", "tests\RepairFlow.Domain.Tests\RepairFlow.Domain.Tests.csproj", "{DC15F655-35BE-46E3-B851-629DC961C667}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepairFlow.Api.Tests", "tests\RepairFlow.Api.Tests\RepairFlow.Api.Tests.csproj", "{7787368A-5045-4D9E-9A8A-E51DBD78DB0E}"
+EndProject
+Global
+  GlobalSection(SolutionConfigurationPlatforms) = preSolution
+    Debug|Any CPU = Debug|Any CPU
+    Release|Any CPU = Release|Any CPU
+  EndGlobalSection
+  GlobalSection(ProjectConfigurationPlatforms) = postSolution
+    {D8F922D0-5E42-4AE1-9134-79E2B23ECDA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {D8F922D0-5E42-4AE1-9134-79E2B23ECDA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {D8F922D0-5E42-4AE1-9134-79E2B23ECDA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {D8F922D0-5E42-4AE1-9134-79E2B23ECDA1}.Release|Any CPU.Build.0 = Release|Any CPU
+    {51D63838-2F08-445A-A1B2-93F18631D711}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {51D63838-2F08-445A-A1B2-93F18631D711}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {51D63838-2F08-445A-A1B2-93F18631D711}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {51D63838-2F08-445A-A1B2-93F18631D711}.Release|Any CPU.Build.0 = Release|Any CPU
+    {F40FB72D-CBD3-45AB-91F0-8FBCC66811A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {F40FB72D-CBD3-45AB-91F0-8FBCC66811A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {F40FB72D-CBD3-45AB-91F0-8FBCC66811A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {F40FB72D-CBD3-45AB-91F0-8FBCC66811A9}.Release|Any CPU.Build.0 = Release|Any CPU
+    {61C854B2-75D0-4D3B-A891-3BB3B16766A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {61C854B2-75D0-4D3B-A891-3BB3B16766A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {61C854B2-75D0-4D3B-A891-3BB3B16766A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {61C854B2-75D0-4D3B-A891-3BB3B16766A8}.Release|Any CPU.Build.0 = Release|Any CPU
+    {DC15F655-35BE-46E3-B851-629DC961C667}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {DC15F655-35BE-46E3-B851-629DC961C667}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {DC15F655-35BE-46E3-B851-629DC961C667}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {DC15F655-35BE-46E3-B851-629DC961C667}.Release|Any CPU.Build.0 = Release|Any CPU
+    {7787368A-5045-4D9E-9A8A-E51DBD78DB0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {7787368A-5045-4D9E-9A8A-E51DBD78DB0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {7787368A-5045-4D9E-9A8A-E51DBD78DB0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {7787368A-5045-4D9E-9A8A-E51DBD78DB0E}.Release|Any CPU.Build.0 = Release|Any CPU
+  EndGlobalSection
+EndGlobal

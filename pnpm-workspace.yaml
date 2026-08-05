@@ -1,0 +1,15 @@
+packages:
+  - apps/desktop
+  - apps/mobile
+  - packages/*
+
+# pnpm 11 treats unapproved dependency lifecycle scripts as a hard failure.
+# Keep the allowlist intentionally narrow and review every addition.
+allowBuilds:
+  electron: true
+  esbuild: true
+
+# Retained for contributors using pnpm 10; pnpm 11 uses allowBuilds above.
+onlyBuiltDependencies:
+  - electron
+  - esbuild

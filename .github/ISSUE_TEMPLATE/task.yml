@@ -1,7 +1,7 @@
 name: Product or engineering task
 description: Propose work with measurable acceptance criteria.
-title: "[Task] "
-labels: ["type:feature"]
+title: '[Task] '
+labels: ['type:feature']
 body:
   - type: textarea
     id: problem

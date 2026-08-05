@@ -1,3 +1,4 @@
+# Environment and credentials
 .env
 .env.*
 !.env.example
@@ -5,23 +6,34 @@
 *.p12
 *.key
 *.pem
+
+# JavaScript
 node_modules/
 .pnpm-store/
+.turbo/
 dist/
+apps/desktop/dist-electron/
 coverage/
+*.tsbuildinfo
+
+# .NET
 bin/
 obj/
 TestResults/
+
+# Expo and native outputs
 .expo/
-android/.gradle/
-ios/Pods/
+apps/mobile/android/.gradle/
+apps/mobile/ios/Pods/
+
+# Runtime and release outputs
 release/
 artifacts/
 *.db
 *.db-shm
 *.db-wal
-local-data/
-temp-evidence/
+*.log
 .DS_Store
-.vscode/
-.idea/
+
+# Generated product media staging
+.tmp-product-media/

@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\RepairFlow.Domain\RepairFlow.Domain.csproj" />
+  </ItemGroup>
+</Project>
