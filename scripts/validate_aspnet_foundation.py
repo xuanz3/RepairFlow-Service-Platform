@@ -27,4 +27,24 @@ for forbidden in ("new WebHostBuilder", "class Startup", "UseDeveloperExceptionP
     if forbidden in program:
         raise SystemExit(f"Outdated ASP.NET Core pattern found: {forbidden}")
 
+
+
+test_projects = (
+    ROOT / "apps/api/tests/RepairFlow.Domain.Tests/RepairFlow.Domain.Tests.csproj",
+    ROOT / "apps/api/tests/RepairFlow.Api.Tests/RepairFlow.Api.Tests.csproj",
+)
+for project in test_projects:
+    content = project.read_text(encoding="utf-8")
+    if 'PackageReference Include="xunit"' not in content:
+        raise SystemExit(f"xUnit package reference is missing: {project.relative_to(ROOT)}")
+
+test_sources = (
+    ROOT / "apps/api/tests/RepairFlow.Domain.Tests/RepairCaseTests.cs",
+    ROOT / "apps/api/tests/RepairFlow.Api.Tests/ApiSmokeTests.cs",
+)
+for source in test_sources:
+    content = source.read_text(encoding="utf-8")
+    if "using Xunit;" not in content:
+        raise SystemExit(f"Explicit xUnit import is missing: {source.relative_to(ROOT)}")
+
 print("ASP.NET Core foundation validation passed.")

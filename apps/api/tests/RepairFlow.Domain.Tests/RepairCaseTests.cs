@@ -1,4 +1,5 @@
 using RepairFlow.Domain;
+using Xunit;
 
 namespace RepairFlow.Domain.Tests;
 
