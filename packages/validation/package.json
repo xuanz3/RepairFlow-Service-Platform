@@ -15,7 +15,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@repairflow/contracts": "workspace:*"
-  },
-  "devDependencies": {}
+    "@repairflow/contracts": "workspace:*",
+    "zod": "4.4.3"
+  }
 }

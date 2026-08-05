@@ -18,5 +18,14 @@
     "verify": "pnpm validate:repo && pnpm validate:phase1 && pnpm validate:frameworks && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "validate:frameworks": "python3 scripts/validate_framework_gates.py"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@eslint/js": "9.39.2",
+    "eslint": "9.39.2",
+    "globals": "16.4.0",
+    "prettier": "3.6.2",
+    "turbo": "2.5.8",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.46.2",
+    "vitest": "3.2.4"
+  }
 }
