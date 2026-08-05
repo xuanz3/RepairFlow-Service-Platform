@@ -35,8 +35,8 @@ for package, expected in required.items():
     if actual != expected:
         raise SystemExit(f"{package} must resolve to {expected}; found {deps.get(package)!r}")
 
-if str(dev_deps.get("@types/react", "")).lstrip("^").lstrip("~") != "19.2.2":
-    raise SystemExit("@types/react must remain on the SDK 55 template-compatible version 19.2.2")
+if str(dev_deps.get("@types/react", "")).lstrip("^").lstrip("~") != "19.2.10":
+    raise SystemExit("@types/react must remain on the Expo-validated SDK 55 version ~19.2.10")
 
 text = lockfile.read_text(encoding="utf-8")
 for forbidden in (
