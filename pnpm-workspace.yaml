@@ -2,3 +2,7 @@ packages:
   - apps/desktop
   - apps/mobile
   - packages/*
+
+onlyBuiltDependencies:
+  - electron
+  - esbuild

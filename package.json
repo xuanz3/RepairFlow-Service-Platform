@@ -17,11 +17,5 @@
     "validate:phase1": "python3 scripts/validate_phase1.py",
     "verify": "pnpm validate:repo && pnpm validate:phase1 && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },
-  "devDependencies": {},
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "electron",
-      "esbuild"
-    ]
-  }
+  "devDependencies": {}
 }
