@@ -1,7 +1,7 @@
 # ADR-007: Resolve Expo modules through the SDK compatibility map
 
 ## Status
-Accepted
+Superseded by ADR-009.
 
 ## Context
 RepairFlow uses Expo SDK 56 with React Native 0.85.1. Installing a separately guessed Expo Router version pulled React Native 0.86 packages whose transitive packages were not yet available from the registry.

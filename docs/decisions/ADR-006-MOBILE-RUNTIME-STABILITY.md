@@ -1,7 +1,7 @@
 # ADR-006: Mobile runtime stability baseline
 
 ## Status
-
+Superseded by ADR-009.
 Accepted for Phase 1.
 
 ## Decision
