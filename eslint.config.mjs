@@ -6,6 +6,11 @@ export default tseslint.config(
   {
     ignores: [
       '**/dist/**',
+      '**/dist-electron/**',
+      '**/.turbo/**',
+      '**/bin/**',
+      '**/obj/**',
+      '**/TestResults/**',
       '**/node_modules/**',
       '**/.expo/**',
       '**/coverage/**',
