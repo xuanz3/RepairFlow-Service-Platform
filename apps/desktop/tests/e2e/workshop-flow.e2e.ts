@@ -19,7 +19,9 @@ test('creates a repair intake and records diagnosis', async ({ page }) => {
   await expect(page.getByTestId('case-workspace')).toContainText('E2E Customer');
 
   await page.getByRole('tab', { name: 'Diagnosis' }).click();
-  await page.getByTestId('diagnosis-summary').fill('Thermal shutdown reproduced after ten minutes.');
+  await page
+    .getByTestId('diagnosis-summary')
+    .fill('Thermal shutdown reproduced after ten minutes.');
   await page
     .getByTestId('diagnosis-recommendation')
     .fill('Clean the cooling assembly and replace thermal compound.');

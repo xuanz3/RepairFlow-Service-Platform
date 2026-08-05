@@ -66,14 +66,16 @@ export const previewCases: RepairCaseDetail[] = [
     reference: 'RF-2608-0002',
     customerDisplayName: 'Example Studio',
     reportedFault: 'Tablet display intermittently loses touch input near the lower edge.',
-    intakeCondition: 'Display glass has no visible cracks. Light frame scuffing at upper-right corner.',
+    intakeCondition:
+      'Display glass has no visible cracks. Light frame scuffing at upper-right corner.',
     device: {
       id: '018f0a9b-4b55-7d62-9d10-11c359f9f302',
       manufacturer: 'Northstar',
       model: 'Slate Pro',
       category: 'Tablet',
       serialNumberMasked: '************0002',
-      intakeCondition: 'Display glass has no visible cracks. Light frame scuffing at upper-right corner.',
+      intakeCondition:
+        'Display glass has no visible cracks. Light frame scuffing at upper-right corner.',
     },
     status: 'checked-in',
     priority: 'standard',
@@ -134,10 +136,14 @@ export function recordDiagnosis(
     actorId: previewActorId,
   };
 
-  return touch(repairCase, {
-    diagnosis,
-    status: repairCase.status === 'checked-in' ? 'diagnosing' : repairCase.status,
-  }, now);
+  return touch(
+    repairCase,
+    {
+      diagnosis,
+      status: repairCase.status === 'checked-in' ? 'diagnosing' : repairCase.status,
+    },
+    now,
+  );
 }
 
 export function addRepairAction(

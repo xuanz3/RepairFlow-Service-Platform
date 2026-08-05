@@ -74,14 +74,16 @@ const previewCases: RepairCaseDetail[] = [
     reference: 'RF-2608-0002',
     customerDisplayName: 'Example Studio',
     reportedFault: 'Tablet display intermittently loses touch input near the lower edge.',
-    intakeCondition: 'Display glass has no visible cracks. Light frame scuffing at upper-right corner.',
+    intakeCondition:
+      'Display glass has no visible cracks. Light frame scuffing at upper-right corner.',
     device: {
       id: '018f0a9b-4b55-7d62-9d10-11c359f9f302',
       manufacturer: 'Northstar',
       model: 'Slate Pro',
       category: 'Tablet',
       serialNumberMasked: '************0002',
-      intakeCondition: 'Display glass has no visible cracks. Light frame scuffing at upper-right corner.',
+      intakeCondition:
+        'Display glass has no visible cracks. Light frame scuffing at upper-right corner.',
     },
     status: 'checked-in',
     priority: 'standard',
@@ -174,9 +176,9 @@ export class LocalWorkflowStore {
   }
 
   private seed(): void {
-    const count = this.database
-      .prepare('SELECT COUNT(*) AS count FROM workflow_cases')
-      .get() as { count: number };
+    const count = this.database.prepare('SELECT COUNT(*) AS count FROM workflow_cases').get() as {
+      count: number;
+    };
 
     if (Number(count.count) > 0) return;
 
@@ -192,19 +194,18 @@ export class LocalWorkflowStore {
 
   private toSummary(item: RepairCaseDetail): RepairCaseSummary {
     return {
-    id: item.id,
-    reference: item.reference,
-    customerDisplayName: item.customerDisplayName,
-    device: item.device,
-    status: item.status,
-    priority: item.priority,
-    assignedTechnicianId: item.assignedTechnicianId,
-    updatedAt: item.updatedAt,
-    version: item.version,
+      id: item.id,
+      reference: item.reference,
+      customerDisplayName: item.customerDisplayName,
+      device: item.device,
+      status: item.status,
+      priority: item.priority,
+      assignedTechnicianId: item.assignedTechnicianId,
+      updatedAt: item.updatedAt,
+      version: item.version,
     };
   }
 }
-
 
 function assertRepairCaseDetail(value: unknown): asserts value is RepairCaseDetail {
   if (!value || typeof value !== 'object') {

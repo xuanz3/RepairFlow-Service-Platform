@@ -437,12 +437,8 @@ function DiagnosisPanel({
   onSave: (updated: RepairCaseDetail) => Promise<void>;
 }) {
   const [summary, setSummary] = useState(repairCase.diagnosis?.summary ?? '');
-  const [recommendation, setRecommendation] = useState(
-    repairCase.diagnosis?.recommendation ?? '',
-  );
-  const [diagnosticCode, setDiagnosticCode] = useState(
-    repairCase.diagnosis?.diagnosticCode ?? '',
-  );
+  const [recommendation, setRecommendation] = useState(repairCase.diagnosis?.recommendation ?? '');
+  const [diagnosticCode, setDiagnosticCode] = useState(repairCase.diagnosis?.diagnosticCode ?? '');
 
   return (
     <form
@@ -568,7 +564,11 @@ function RepairPanel({
         <FormField label="Part number">
           <input value={partNumber} onChange={(event) => setPartNumber(event.target.value)} />
         </FormField>
-        <button className="primary-button align-start" data-testid="add-repair-action" type="submit">
+        <button
+          className="primary-button align-start"
+          data-testid="add-repair-action"
+          type="submit"
+        >
           Add action
         </button>
       </form>
