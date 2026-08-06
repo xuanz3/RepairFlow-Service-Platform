@@ -1,3 +1,4 @@
+using System.Globalization;
 using RepairFlow.Domain;
 using Xunit;
 
@@ -11,7 +12,7 @@ public sealed class RepairCaseTests
     [Fact]
     public void NewRepairCaseStartsCheckedInAtVersionOne()
     {
-        var now = DateTimeOffset.Parse("2026-08-05T10:00:00Z");
+        var now = ParseTimestamp("2026-08-05T10:00:00Z");
         var repairCase = CreateCase(now);
 
         Assert.Equal(RepairCaseStatus.CheckedIn, repairCase.Status);
@@ -24,7 +25,7 @@ public sealed class RepairCaseTests
     [Fact]
     public void DiagnosisMovesCheckedInCaseIntoDiagnosing()
     {
-        var now = DateTimeOffset.Parse("2026-08-05T10:00:00Z");
+        var now = ParseTimestamp("2026-08-05T10:00:00Z");
         var repairCase = CreateCase(now);
 
         repairCase.RecordDiagnosis(
@@ -43,7 +44,7 @@ public sealed class RepairCaseTests
     [Fact]
     public void StaleVersionIsRejectedBeforeMutation()
     {
-        var now = DateTimeOffset.Parse("2026-08-05T10:00:00Z");
+        var now = ParseTimestamp("2026-08-05T10:00:00Z");
         var repairCase = CreateCase(now);
 
         repairCase.RecordDiagnosis(
@@ -71,7 +72,7 @@ public sealed class RepairCaseTests
     [Fact]
     public void QualityCheckRequiresAllRepairActionsCompleted()
     {
-        var now = DateTimeOffset.Parse("2026-08-05T10:00:00Z");
+        var now = ParseTimestamp("2026-08-05T10:00:00Z");
         var repairCase = CreateCase(now);
         var action = repairCase.AddRepairAction(
             ActorId,
@@ -102,7 +103,7 @@ public sealed class RepairCaseTests
     [Fact]
     public void PassingQualityReviewRequiresCompleteEvidence()
     {
-        var now = DateTimeOffset.Parse("2026-08-05T10:00:00Z");
+        var now = ParseTimestamp("2026-08-05T10:00:00Z");
         var repairCase = CreateQualityReadyCase(now);
 
         Assert.Throws<InvalidOperationException>(() =>
@@ -129,7 +130,7 @@ public sealed class RepairCaseTests
     [Fact]
     public void FailedQualityReviewReturnsCaseToRepair()
     {
-        var now = DateTimeOffset.Parse("2026-08-05T10:00:00Z");
+        var now = ParseTimestamp("2026-08-05T10:00:00Z");
         var repairCase = CreateQualityReadyCase(now);
 
         repairCase.SubmitQualityReview(
@@ -142,6 +143,11 @@ public sealed class RepairCaseTests
 
         Assert.Equal(RepairCaseStatus.InRepair, repairCase.Status);
         Assert.Equal(5, repairCase.Version);
+    }
+
+    private static DateTimeOffset ParseTimestamp(string value)
+    {
+        return DateTimeOffset.Parse(value, CultureInfo.InvariantCulture);
     }
 
     private static RepairCase CreateCase(DateTimeOffset now)

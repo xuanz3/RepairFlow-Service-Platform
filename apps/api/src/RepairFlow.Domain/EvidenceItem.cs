@@ -48,10 +48,7 @@ public sealed class EvidenceItem
         ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
         ArgumentException.ThrowIfNullOrWhiteSpace(contentType);
 
-        if (sizeBytes < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(sizeBytes));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(sizeBytes);
 
         if (!string.IsNullOrWhiteSpace(sha256) && sha256.Trim().Length != 64)
         {
