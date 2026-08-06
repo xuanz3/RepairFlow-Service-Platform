@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const nodeExecutable = JSON.stringify(process.execPath);
+
 export default defineConfig({
   testDir: './tests/e2e',
   testMatch: '**/*.e2e.ts',
@@ -15,9 +17,9 @@ export default defineConfig({
     ...devices['Desktop Chrome'],
   },
   webServer: {
-    command: 'pnpm build && pnpm preview',
+    command: `${nodeExecutable} ./node_modules/vite/bin/vite.js preview --host 127.0.0.1 --port 4173`,
     url: 'http://127.0.0.1:4173',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 120_000,
   },
 });
