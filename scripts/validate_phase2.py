@@ -37,6 +37,24 @@ for relative in required_files:
 root_manifest = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
 if root_manifest.get("version") != "0.4.0":
     errors.append("Root package version must be 0.4.0 during Phase 2.")
+root_scripts = root_manifest.get("scripts", {})
+verify_script = str(root_scripts.get("verify", ""))
+for forbidden in (
+    "pnpm validate:",
+    "pnpm format:check",
+    "pnpm lint",
+    "pnpm typecheck",
+    "pnpm test",
+    "pnpm build",
+):
+    if forbidden in verify_script:
+        errors.append(f"Root verify script must not recursively resolve pnpm from PATH: {forbidden}")
+if "python3 scripts/validate_phase2.py" not in verify_script or "turbo run build" not in verify_script:
+    errors.append("Root verify script does not expose the complete self-contained Phase 2 gate.")
+if root_scripts.get("e2e:desktop") != "npm --prefix apps/desktop run e2e":
+    errors.append("Desktop e2e runner must execute from the desktop package without nested pnpm lookup.")
+if root_scripts.get("verify:phase2") != "npm run verify && npm run e2e:desktop":
+    errors.append("Phase 2 verification runner must compose the self-contained verify and desktop e2e scripts.")
 desktop_manifest = json.loads((ROOT / "apps/desktop/package.json").read_text(encoding="utf-8"))
 if desktop_manifest.get("version") != "0.3.0":
     errors.append("Desktop preview package version must be 0.3.0.")
