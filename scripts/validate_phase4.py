@@ -37,6 +37,10 @@ for token in ["include: ['src/**/*.test.{ts,tsx}']", "'tests/**'"]:
 for forbidden in ["tests/a11y", "tests/e2e", "tests/media"]:
  assert forbidden not in vitest_config.replace("'tests/**'", ""), f'Vitest must not collect Playwright suite: {forbidden}'
 
+media_config=(root/'apps/desktop/playwright.media.config.ts').read_text()
+assert "testDir: './tests/media'" in media_config, 'Desktop media Playwright config must target tests/media'
+assert "testMatch: '**/*.e2e.ts'" in media_config, 'Desktop media Playwright config must collect the .e2e.ts capture suite'
+
 workflow=(root/'.github/workflows/phase4-release-candidate.yml').read_text()
 assert 'head -n 1' not in workflow, 'Phase 4 workflow must not use early-exit head pipelines under GitHub Actions pipefail'
 for token in ['desktop-package','android-package','ios-package','desktop-media','aggregate-release']:
