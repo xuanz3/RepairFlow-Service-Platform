@@ -27,7 +27,9 @@
     "verify:phase2": "npm run verify && npm run e2e:desktop",
     "verify:phase3": "npm run verify && npm run test:failure && npm run measure:sync",
     "release:metadata": "node tools/release/build-metadata.mjs",
-    "release:checksums": "node tools/release/generate-checksums.mjs"
+    "release:checksums": "node tools/release/generate-checksums.mjs",
+    "release:sbom": "node tools/release/generate-sbom.mjs",
+    "release:verify": "node tools/verify/release-bundle-contract.mjs"
   },
   "devDependencies": {
     "@eslint/js": "9.39.2",
