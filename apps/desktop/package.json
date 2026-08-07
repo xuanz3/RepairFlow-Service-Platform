@@ -14,7 +14,8 @@
     "package:prepare": "node ../../tools/release/prepare-desktop-package.mjs",
     "package:mac": "pnpm package:prepare && electron-builder --projectDir .release-package --mac zip --arm64",
     "package:win": "pnpm package:prepare && electron-builder --projectDir .release-package --win portable --x64",
-    "package:linux": "pnpm package:prepare && electron-builder --projectDir .release-package --linux AppImage --x64"
+    "package:linux": "pnpm package:prepare && electron-builder --projectDir .release-package --linux AppImage --x64",
+    "a11y": "playwright test --config=playwright.a11y.config.ts"
   },
   "dependencies": {
     "@repairflow/api-client": "workspace:*",
@@ -36,6 +37,7 @@
     "electron": "43.2.0",
     "vite": "8.2.0",
     "wait-on": "9.1.0",
-    "electron-builder": "26.15.3"
+    "electron-builder": "26.15.3",
+    "@axe-core/playwright": "4.12.1"
   }
 }

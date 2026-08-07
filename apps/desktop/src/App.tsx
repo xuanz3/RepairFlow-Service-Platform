@@ -227,7 +227,7 @@ export function App() {
               </label>
             </div>
 
-            <div className="case-list" role="list">
+            <div className="case-list">
               {filteredCases.map((repairCase) => (
                 <CaseRow
                   key={repairCase.id}
@@ -415,7 +415,6 @@ function CaseRow({
       className={selected ? 'case-row selected' : 'case-row'}
       onClick={onSelect}
       type="button"
-      role="listitem"
     >
       <div className="device-icon">{repairCase.device.category.slice(0, 1)}</div>
       <div className="case-primary">
