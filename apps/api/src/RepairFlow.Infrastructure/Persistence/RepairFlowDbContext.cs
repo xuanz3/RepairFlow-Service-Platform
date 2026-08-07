@@ -16,6 +16,9 @@ public sealed class RepairFlowDbContext(DbContextOptions<RepairFlowDbContext> op
     public DbSet<EvidenceItem> EvidenceItems => Set<EvidenceItem>();
     public DbSet<QualityReview> QualityReviews => Set<QualityReview>();
     public DbSet<AuditEntry> AuditEntries => Set<AuditEntry>();
+    public DbSet<SyncOperationRecord> SyncOperations => Set<SyncOperationRecord>();
+    public DbSet<SyncChange> SyncChanges => Set<SyncChange>();
+    public DbSet<AttachmentUploadSession> AttachmentUploadSessions => Set<AttachmentUploadSession>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -118,6 +121,38 @@ public sealed class RepairFlowDbContext(DbContextOptions<RepairFlowDbContext> op
             entity.HasIndex(item => new { item.RepairCaseId, item.CreatedAt });
             entity.Property(item => item.Action).HasMaxLength(120);
             entity.Property(item => item.Detail).HasMaxLength(2000);
+        });
+
+        builder.Entity<SyncOperationRecord>(entity =>
+        {
+            entity.ToTable("sync_operations");
+            entity.HasKey(item => item.OperationId);
+            entity.HasIndex(item => new { item.ActorId, item.CreatedAt });
+            entity.Property(item => item.Kind).HasMaxLength(80);
+            entity.Property(item => item.RequestHash).HasMaxLength(64);
+            entity.Property(item => item.State).HasConversion<string>().HasMaxLength(32);
+            entity.Property(item => item.ResponseJson).HasColumnType("text");
+        });
+
+        builder.Entity<SyncChange>(entity =>
+        {
+            entity.ToTable("sync_changes");
+            entity.HasKey(item => item.Id);
+            entity.Property(item => item.Id).ValueGeneratedOnAdd();
+            entity.HasIndex(item => new { item.EntityType, item.EntityId, item.Id });
+            entity.Property(item => item.EntityType).HasMaxLength(40);
+            entity.Property(item => item.PayloadJson).HasColumnType("text");
+        });
+
+        builder.Entity<AttachmentUploadSession>(entity =>
+        {
+            entity.ToTable("attachment_upload_sessions");
+            entity.HasKey(item => item.Id);
+            entity.HasIndex(item => new { item.RepairCaseId, item.State, item.UpdatedAt });
+            entity.Property(item => item.FileName).HasMaxLength(240);
+            entity.Property(item => item.ContentType).HasMaxLength(120);
+            entity.Property(item => item.Sha256).HasMaxLength(64);
+            entity.Property(item => item.State).HasConversion<string>().HasMaxLength(32);
         });
     }
 }
