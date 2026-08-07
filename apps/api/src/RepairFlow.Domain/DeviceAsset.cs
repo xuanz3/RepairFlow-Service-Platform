@@ -4,7 +4,13 @@ public sealed class DeviceAsset
 {
     private DeviceAsset() { }
 
-    private DeviceAsset(Guid repairCaseId, string manufacturer, string model, string category, string serialNumber)
+    private DeviceAsset(
+        Guid repairCaseId,
+        string manufacturer,
+        string model,
+        string category,
+        string serialNumber,
+        string intakeCondition)
     {
         Id = Guid.CreateVersion7();
         RepairCaseId = repairCaseId;
@@ -12,6 +18,7 @@ public sealed class DeviceAsset
         Model = model.Trim();
         Category = category.Trim();
         SerialNumber = serialNumber.Trim();
+        IntakeCondition = intakeCondition.Trim();
     }
 
     public Guid Id { get; private set; }
@@ -20,14 +27,29 @@ public sealed class DeviceAsset
     public string Model { get; private set; } = string.Empty;
     public string Category { get; private set; } = string.Empty;
     public string SerialNumber { get; private set; } = string.Empty;
+    public string IntakeCondition { get; private set; } = string.Empty;
 
-    public static DeviceAsset Create(Guid repairCaseId, string manufacturer, string model, string category, string serialNumber)
+    public static DeviceAsset Create(
+        Guid repairCaseId,
+        string manufacturer,
+        string model,
+        string category,
+        string serialNumber,
+        string intakeCondition)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(manufacturer);
         ArgumentException.ThrowIfNullOrWhiteSpace(model);
         ArgumentException.ThrowIfNullOrWhiteSpace(category);
         ArgumentException.ThrowIfNullOrWhiteSpace(serialNumber);
-        return new DeviceAsset(repairCaseId, manufacturer, model, category, serialNumber);
+        ArgumentException.ThrowIfNullOrWhiteSpace(intakeCondition);
+
+        return new DeviceAsset(
+            repairCaseId,
+            manufacturer,
+            model,
+            category,
+            serialNumber,
+            intakeCondition);
     }
 
     public string GetMaskedSerialNumber()

@@ -1,8 +1,8 @@
 # RepairFlow
 
-RepairFlow is an offline-first repair operations platform for electronics service teams. It connects mobile device intake and workshop evidence capture with a desktop repair workspace and a central service API.
+RepairFlow is an offline-first repair operations platform for electronics service teams. It connects mobile device intake and evidence capture with a desktop workshop workspace and an ASP.NET Core service.
 
-> Current stage: **Phase 1 - Platform Foundation and Service Core**
+> Current stage: **Phase 2 - Desktop and Mobile Repair Workflows**
 
 ## Core workflow
 
@@ -10,35 +10,48 @@ RepairFlow is an offline-first repair operations platform for electronics servic
 
 <!-- product-media:start -->
 
-Product media will be inserted here by the validated capture pipeline in Phase 4.
+Product media will be inserted by the validated capture pipeline in Phase 4.
 
 <!-- product-media:end -->
 
+## Operational capabilities
+
+- Desktop workshop queue with search, filters and case-level workspaces
+- Electron SQLite workflow store behind a context-isolated IPC boundary
+- Mobile SQLite queue with validated device check-in
+- Expo Camera QR scanning and persistent evidence capture
+- Diagnosis, repair actions, evidence and quality review on both clients
+- ASP.NET Core workflow endpoints with role policies and version checks
+- Playwright desktop end-to-end validation and Maestro mobile flow contracts
+
 ## Platform
 
-| Component            | Responsibility                                                                                    |
-| -------------------- | ------------------------------------------------------------------------------------------------- |
-| Mobile               | Device check-in, QR lookup, condition evidence, diagnosis steps and offline queue visibility      |
-| Desktop              | Workshop queue, repair case inspection, evidence comparison, quality verification and diagnostics |
-| Service              | Identity, roles, repair workflow rules, PostgreSQL persistence, audit records and OpenAPI         |
-| Local infrastructure | PostgreSQL and Azurite through Docker Compose                                                     |
+| Component            | Responsibility                                                                             |
+| -------------------- | ------------------------------------------------------------------------------------------ |
+| Mobile               | Device check-in, QR lookup, condition evidence, diagnosis, repair actions and local queue  |
+| Desktop              | Workshop queue, case inspection, repair action tracking, evidence and quality verification |
+| Service              | Identity, roles, workflow rules, PostgreSQL persistence, audit records and OpenAPI         |
+| Local infrastructure | PostgreSQL and Azurite through Docker Compose                                              |
 
 ## Technology
 
 - React Native + Expo for iOS and Android
 - Electron + React + TypeScript for Windows, macOS and Linux
 - ASP.NET Core and C# for the service layer
-- PostgreSQL for central data and SQLite for client-side offline storage
+- PostgreSQL for central data
+- SQLite for Electron and mobile local workflow stores
+- Expo Camera, FileSystem, Crypto and SecureStore for mobile capture boundaries
 - pnpm workspaces and Turborepo for the shared TypeScript workspace
-- GitHub Actions for validation, builds and release checks
+- xUnit, Vitest, Playwright and Maestro for workflow validation
+- GitHub Actions for validation, cross-platform builds and release checks
 
 ## Repository structure
 
 ```text
 apps/
-  api/       ASP.NET Core modular service
+  api/       ASP.NET Core workflow service
   desktop/   Electron workshop client
-  mobile/    React Native intake client
+  mobile/    React Native intake and repair client
 packages/
   api-client/
   contracts/
@@ -64,6 +77,8 @@ Requirements:
 pnpm install --frozen-lockfile
 dotnet restore apps/api/RepairFlow.sln --locked-mode
 pnpm verify
+pnpm --filter @repairflow/desktop exec playwright install chromium
+pnpm e2e:desktop
 dotnet build apps/api/RepairFlow.sln --configuration Release --no-restore
 dotnet test apps/api/RepairFlow.sln --configuration Release --no-build
 ./tools/verify/service-smoke.sh
@@ -86,10 +101,10 @@ All example customers, devices, serial numbers and attachments are fictional or 
 | ------- | ---------------------------------------------------------------- | -------- |
 | Phase 0 | Product definition, design direction and repository governance   | Complete |
 | Phase 1 | Platform foundation, backend, identity and shared contracts      | Complete |
-| Phase 2 | Desktop and mobile repair workflows                              | Planned  |
+| Phase 2 | Desktop and mobile repair workflows                              | Complete |
 | Phase 3 | Offline synchronisation, reliability, security and observability | Planned  |
 | Phase 4 | Packaging, automated product media and the v1.0 release          | Planned  |
 
 ## Licence
 
-MIT Licence. See `LICENSE`.
+MIT

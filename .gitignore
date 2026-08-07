@@ -37,3 +37,8 @@ artifacts/
 
 # Generated product media staging
 .tmp-product-media/
+
+# End-to-end test outputs
+playwright-report/
+test-results/
+blob-report/

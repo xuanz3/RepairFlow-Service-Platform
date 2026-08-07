@@ -1,15 +1,20 @@
-import { app, BrowserWindow, shell } from 'electron';
+import { createHash, randomUUID } from 'node:crypto';
+import { copyFileSync, mkdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
+import type { EvidenceMetadata, RepairCaseDetail } from '@repairflow/contracts';
+import { LocalWorkflowStore } from './workflowStore.js';
 
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
+let store: LocalWorkflowStore | undefined;
 
 function createWindow(): void {
   const window = new BrowserWindow({
-    width: 1440,
-    height: 920,
-    minWidth: 1080,
-    minHeight: 680,
+    width: 1480,
+    height: 940,
+    minWidth: 1120,
+    minHeight: 720,
     backgroundColor: '#0f141c',
     title: 'RepairFlow Workshop',
     webPreferences: {
@@ -21,7 +26,7 @@ function createWindow(): void {
   });
 
   window.webContents.setWindowOpenHandler(({ url }) => {
-    void shell.openExternal(url);
+    if (url.startsWith('https://')) void shell.openExternal(url);
     return { action: 'deny' };
   });
 
@@ -32,11 +37,78 @@ function createWindow(): void {
   }
 }
 
+function registerWorkflowIpc(workflowStore: LocalWorkflowStore): void {
+  ipcMain.handle('workflow:list', () => workflowStore.list());
+  ipcMain.handle('workflow:get', (_event, id: string) => workflowStore.get(id));
+  ipcMain.handle('workflow:save', (_event, repairCase: RepairCaseDetail) =>
+    workflowStore.save(repairCase),
+  );
+  ipcMain.handle('workflow:reset', () => workflowStore.reset());
+  ipcMain.handle('workflow:select-evidence', async (): Promise<EvidenceMetadata | null> => {
+    const result = await dialog.showOpenDialog({
+      title: 'Attach repair evidence',
+      properties: ['openFile'],
+      filters: [
+        { name: 'Supported evidence', extensions: ['jpg', 'jpeg', 'png', 'webp', 'pdf', 'txt'] },
+      ],
+    });
+
+    const sourcePath = result.filePaths[0];
+    if (result.canceled || !sourcePath) return null;
+
+    const evidenceDirectory = path.join(app.getPath('userData'), 'evidence');
+    mkdirSync(evidenceDirectory, { recursive: true });
+    const extension = path.extname(sourcePath).toLowerCase();
+    const fileName = `${randomUUID()}${extension}`;
+    const destinationPath = path.join(evidenceDirectory, fileName);
+    copyFileSync(sourcePath, destinationPath);
+
+    const bytes = readFileSync(destinationPath);
+    const digest = createHash('sha256').update(bytes).digest('hex');
+    const contentType = mimeTypeFor(extension);
+
+    return {
+      id: randomUUID(),
+      fileName: path.basename(sourcePath),
+      contentType,
+      sizeBytes: statSync(destinationPath).size,
+      sha256: digest,
+      localUri: destinationPath,
+      kind: 'repair',
+      createdAt: new Date().toISOString(),
+    };
+  });
+}
+
+function mimeTypeFor(extension: string): string {
+  switch (extension) {
+    case '.jpg':
+    case '.jpeg':
+      return 'image/jpeg';
+    case '.png':
+      return 'image/png';
+    case '.webp':
+      return 'image/webp';
+    case '.pdf':
+      return 'application/pdf';
+    default:
+      return 'text/plain';
+  }
+}
+
 app.whenReady().then(() => {
+  store = new LocalWorkflowStore(path.join(app.getPath('userData'), 'repairflow-workflows.sqlite'));
+  registerWorkflowIpc(store);
   createWindow();
+
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
+});
+
+app.on('before-quit', () => {
+  store?.close();
+  store = undefined;
 });
 
 app.on('window-all-closed', () => {

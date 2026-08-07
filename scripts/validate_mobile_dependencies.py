@@ -25,6 +25,9 @@ required = {
     "expo-status-bar": "55.0.6",
     "expo-sqlite": "55.0.18",
     "expo-secure-store": "55.0.16",
+    "expo-camera": "55.0.21",
+    "expo-file-system": "55.0.24",
+    "expo-crypto": "55.0.17",
     "react": "19.2.0",
     "react-native": "0.83.10",
     "react-native-safe-area-context": "5.6.2",
@@ -37,6 +40,18 @@ for package, expected in required.items():
 
 if str(dev_deps.get("@types/react", "")).lstrip("^").lstrip("~") != "19.2.10":
     raise SystemExit("@types/react must remain on the Expo-validated SDK 55 version ~19.2.10")
+
+
+app_config = json.loads((ROOT / "apps" / "mobile" / "app.json").read_text(encoding="utf-8"))
+plugins = app_config.get("expo", {}).get("plugins", [])
+camera_entries = [entry for entry in plugins if isinstance(entry, list) and entry and entry[0] == "expo-camera"]
+if len(camera_entries) != 1:
+    raise SystemExit("expo-camera must have exactly one explicit config-plugin entry")
+camera_options = camera_entries[0][1] if len(camera_entries[0]) > 1 else {}
+if camera_options.get("barcodeScannerEnabled") is not True:
+    raise SystemExit("expo-camera barcode scanning must remain explicitly enabled")
+if camera_options.get("recordAudioAndroid") is not False or camera_options.get("microphonePermission") is not False:
+    raise SystemExit("RepairFlow camera capture must not request microphone access")
 
 text = lockfile.read_text(encoding="utf-8")
 for forbidden in (
@@ -51,5 +66,13 @@ for forbidden in (
 ):
     if forbidden in text:
         raise SystemExit(f"Forbidden incompatible dependency found in lockfile: {forbidden}")
+
+for required_lock in (
+    "expo-camera@55.0.21",
+    "expo-file-system@55.0.24",
+    "expo-crypto@55.0.17",
+):
+    if required_lock not in text:
+        raise SystemExit(f"Required SDK 55 capability is missing from lockfile: {required_lock}")
 
 print("Mobile dependency compatibility validation passed for the official Expo SDK 55 lane.")

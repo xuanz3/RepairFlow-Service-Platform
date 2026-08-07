@@ -3,7 +3,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".expo/**"]
+      "outputs": ["dist/**", "dist-electron/**"]
     },
     "dev": {
       "cache": false,
@@ -14,7 +14,7 @@
     },
     "test": {
       "dependsOn": ["^build"],
-      "outputs": ["coverage/**"]
+      "outputs": []
     },
     "typecheck": {
       "dependsOn": ["^build"]

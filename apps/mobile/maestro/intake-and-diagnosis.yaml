@@ -1,0 +1,38 @@
+appId: com.xuanz3.repairflow.mobile
+---
+- launchApp:
+    clearState: true
+- assertVisible: 'Workshop intake'
+- tapOn:
+    id: 'mobile-new-intake'
+- tapOn:
+    id: 'intake-customer'
+- inputText: 'Maestro Customer'
+- tapOn:
+    id: 'intake-manufacturer'
+- inputText: 'Orion'
+- tapOn:
+    id: 'intake-model'
+- inputText: 'Notebook 14'
+- tapOn:
+    id: 'intake-serial'
+- inputText: 'MAESTRO-0001'
+- tapOn:
+    id: 'intake-fault'
+- inputText: 'Device shuts down during sustained load.'
+- tapOn:
+    id: 'intake-condition'
+- inputText: 'No visible impact damage.'
+- tapOn:
+    id: 'save-intake'
+- assertVisible: 'Maestro Customer'
+- tapOn: 'diagnosis'
+- tapOn:
+    id: 'mobile-diagnosis-summary'
+- inputText: 'Thermal shutdown reproduced.'
+- tapOn:
+    id: 'mobile-diagnosis-recommendation'
+- inputText: 'Service cooling assembly.'
+- tapOn:
+    id: 'mobile-save-diagnosis'
+- assertVisible: 'Version 2'

@@ -11,7 +11,10 @@ public sealed class RepairFlowDbContext(DbContextOptions<RepairFlowDbContext> op
 {
     public DbSet<RepairCase> RepairCases => Set<RepairCase>();
     public DbSet<DeviceAsset> Devices => Set<DeviceAsset>();
+    public DbSet<DiagnosisRecord> Diagnoses => Set<DiagnosisRecord>();
+    public DbSet<RepairAction> RepairActions => Set<RepairAction>();
     public DbSet<EvidenceItem> EvidenceItems => Set<EvidenceItem>();
+    public DbSet<QualityReview> QualityReviews => Set<QualityReview>();
     public DbSet<AuditEntry> AuditEntries => Set<AuditEntry>();
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -32,7 +35,19 @@ public sealed class RepairFlowDbContext(DbContextOptions<RepairFlowDbContext> op
                 .WithOne()
                 .HasForeignKey<DeviceAsset>(item => item.RepairCaseId)
                 .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(item => item.Diagnosis)
+                .WithOne()
+                .HasForeignKey<DiagnosisRecord>(item => item.RepairCaseId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(item => item.RepairActions)
+                .WithOne()
+                .HasForeignKey(item => item.RepairCaseId)
+                .OnDelete(DeleteBehavior.Cascade);
             entity.HasMany(item => item.Evidence)
+                .WithOne()
+                .HasForeignKey(item => item.RepairCaseId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(item => item.QualityReviews)
                 .WithOne()
                 .HasForeignKey(item => item.RepairCaseId)
                 .OnDelete(DeleteBehavior.Cascade);
@@ -51,15 +66,49 @@ public sealed class RepairFlowDbContext(DbContextOptions<RepairFlowDbContext> op
             entity.Property(item => item.Model).HasMaxLength(120);
             entity.Property(item => item.Category).HasMaxLength(80);
             entity.Property(item => item.SerialNumber).HasMaxLength(160);
+            entity.Property(item => item.IntakeCondition).HasMaxLength(2000);
+        });
+
+        builder.Entity<DiagnosisRecord>(entity =>
+        {
+            entity.ToTable("diagnoses");
+            entity.HasKey(item => item.Id);
+            entity.HasIndex(item => item.RepairCaseId).IsUnique();
+            entity.Property(item => item.Summary).HasMaxLength(4000);
+            entity.Property(item => item.Recommendation).HasMaxLength(2000);
+            entity.Property(item => item.DiagnosticCode).HasMaxLength(80);
+        });
+
+        builder.Entity<RepairAction>(entity =>
+        {
+            entity.ToTable("repair_actions");
+            entity.HasKey(item => item.Id);
+            entity.HasIndex(item => new { item.RepairCaseId, item.CreatedAt });
+            entity.Property(item => item.Title).HasMaxLength(160);
+            entity.Property(item => item.Detail).HasMaxLength(2000);
+            entity.Property(item => item.PartNumber).HasMaxLength(120);
+            entity.Property(item => item.Status).HasConversion<string>().HasMaxLength(32);
         });
 
         builder.Entity<EvidenceItem>(entity =>
         {
             entity.ToTable("evidence_items");
             entity.HasKey(item => item.Id);
+            entity.HasIndex(item => new { item.RepairCaseId, item.CreatedAt });
             entity.Property(item => item.FileName).HasMaxLength(240);
             entity.Property(item => item.ContentType).HasMaxLength(120);
             entity.Property(item => item.Sha256).HasMaxLength(64);
+            entity.Property(item => item.Kind).HasConversion<string>().HasMaxLength(32);
+            entity.Property(item => item.Note).HasMaxLength(1000);
+        });
+
+        builder.Entity<QualityReview>(entity =>
+        {
+            entity.ToTable("quality_reviews");
+            entity.HasKey(item => item.Id);
+            entity.HasIndex(item => new { item.RepairCaseId, item.CreatedAt });
+            entity.Property(item => item.Outcome).HasConversion<string>().HasMaxLength(40);
+            entity.Property(item => item.Notes).HasMaxLength(2000);
         });
 
         builder.Entity<AuditEntry>(entity =>

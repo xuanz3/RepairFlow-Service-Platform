@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -56,5 +55,15 @@ with tempfile.TemporaryDirectory(prefix="repairflow-mobile-preflight-") as tmp:
     for token in forbidden:
         if token in text:
             raise SystemExit(f"Mobile dependency preflight rejected incompatible dependency: {token}")
+
+    for package, version in (
+        ("expo-camera", "55.0.21"),
+        ("expo-file-system", "55.0.24"),
+        ("expo-crypto", "55.0.17"),
+    ):
+        if f"{package}@{version}" not in text:
+            raise SystemExit(
+                f"Mobile dependency preflight did not resolve the required SDK 55 package: {package}@{version}"
+            )
 
 print("Isolated mobile dependency preflight passed.")

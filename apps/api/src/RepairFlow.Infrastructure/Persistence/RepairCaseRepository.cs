@@ -17,10 +17,17 @@ public sealed class RepairCaseRepository(RepairFlowDbContext database) : IRepair
 
     public Task<RepairCase?> FindAsync(Guid id, CancellationToken cancellationToken)
     {
-        return database.RepairCases
-            .Include(item => item.Device)
-            .Include(item => item.AuditEntries)
+        return FullGraph()
             .SingleOrDefaultAsync(item => item.Id == id, cancellationToken);
+    }
+
+    public Task<bool> ReferenceExistsAsync(
+        string reference,
+        CancellationToken cancellationToken)
+    {
+        return database.RepairCases.AnyAsync(
+            item => item.Reference == reference,
+            cancellationToken);
     }
 
     public Task AddAsync(RepairCase repairCase, CancellationToken cancellationToken)
@@ -32,4 +39,13 @@ public sealed class RepairCaseRepository(RepairFlowDbContext database) : IRepair
     {
         return database.SaveChangesAsync(cancellationToken);
     }
+
+    private IQueryable<RepairCase> FullGraph() =>
+        database.RepairCases
+            .Include(item => item.Device)
+            .Include(item => item.Diagnosis)
+            .Include(item => item.RepairActions)
+            .Include(item => item.Evidence)
+            .Include(item => item.QualityReviews)
+            .Include(item => item.AuditEntries);
 }

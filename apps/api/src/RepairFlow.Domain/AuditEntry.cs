@@ -4,13 +4,18 @@ public sealed class AuditEntry
 {
     private AuditEntry() { }
 
-    private AuditEntry(Guid repairCaseId, Guid actorId, string action, string detail, DateTimeOffset createdAt)
+    private AuditEntry(
+        Guid repairCaseId,
+        Guid actorId,
+        string action,
+        string detail,
+        DateTimeOffset createdAt)
     {
         Id = Guid.CreateVersion7();
         RepairCaseId = repairCaseId;
         ActorId = actorId;
-        Action = action;
-        Detail = detail;
+        Action = action.Trim();
+        Detail = detail.Trim();
         CreatedAt = createdAt;
     }
 
@@ -20,6 +25,18 @@ public sealed class AuditEntry
     public string Action { get; private set; } = string.Empty;
     public string Detail { get; private set; } = string.Empty;
     public DateTimeOffset CreatedAt { get; private set; }
+
+    public static AuditEntry Record(
+        Guid repairCaseId,
+        Guid actorId,
+        string action,
+        string detail,
+        DateTimeOffset now)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(action);
+        ArgumentException.ThrowIfNullOrWhiteSpace(detail);
+        return new AuditEntry(repairCaseId, actorId, action, detail, now);
+    }
 
     public static AuditEntry RecordStatusChange(
         Guid repairCaseId,

@@ -84,7 +84,7 @@ jobs:
       - run: pnpm --filter @repairflow/api-client build
       - run: pnpm --filter @repairflow/desktop typecheck
       - run: pnpm --filter @repairflow/desktop build
-      - run: pnpm --filter @repairflow/mobile typecheck
+      - run: pnpm exec turbo run typecheck --filter=@repairflow/mobile
 
   compose-contract:
     name: Local Service Contract
