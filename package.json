@@ -23,7 +23,7 @@
     "validate:repo": "python3 scripts/validate_repository.py",
     "test:failure": "node tools/verify/phase3-failure-scenarios.mjs",
     "measure:sync": "node tools/verify/measure-sync-engine.mjs",
-    "verify": "python3 scripts/validate_repository.py && python3 scripts/validate_phase1.py && python3 scripts/validate_phase2.py && python3 scripts/validate_phase3.py && python3 scripts/validate_phase3_security.py && python3 scripts/validate_framework_gates.py && python3 scripts/validate_maestro_flows.py && prettier --check . && eslint . && turbo run typecheck && turbo run test && turbo run build",
+    "verify": "python3 scripts/validate_repository.py && python3 scripts/validate_phase1.py && python3 scripts/validate_phase2.py && python3 scripts/validate_phase3.py && python3 scripts/validate_phase3_security.py && python3 scripts/validate_phase4.py && python3 scripts/validate_framework_gates.py && python3 scripts/validate_maestro_flows.py && prettier --check . && eslint . && turbo run typecheck && turbo run test && turbo run build",
     "verify:phase2": "npm run verify && npm run e2e:desktop",
     "verify:phase3": "npm run verify && npm run test:failure && npm run measure:sync",
     "release:metadata": "node tools/release/build-metadata.mjs",
@@ -31,7 +31,9 @@
     "release:sbom": "node tools/release/generate-sbom.mjs",
     "release:verify": "node tools/verify/release-bundle-contract.mjs",
     "media:compose": "node tools/media/compose-final-media.mjs",
-    "media:insert": "node tools/media/insert-readme-media.mjs"
+    "media:insert": "node tools/media/insert-readme-media.mjs",
+    "validate:phase4": "python3 scripts/validate_phase4.py",
+    "verify:phase4": "npm run verify && npm run test:failure && npm run measure:sync && npm run validate:phase4"
   },
   "devDependencies": {
     "@eslint/js": "9.39.2",
