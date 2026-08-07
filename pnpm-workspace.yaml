@@ -8,8 +8,10 @@ packages:
 allowBuilds:
   electron: true
   esbuild: true
+  sharp: true
 
 # Retained for contributors using pnpm 10; pnpm 11 uses allowBuilds above.
 onlyBuiltDependencies:
   - electron
   - esbuild
+  - sharp
