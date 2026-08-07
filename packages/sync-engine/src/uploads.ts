@@ -37,7 +37,8 @@ export function nextUploadChunk(plan: UploadPlan, receivedBytes: number): Upload
     throw new RangeError('Received byte count is outside the upload plan.');
   }
   if (receivedBytes === plan.totalBytes) return undefined;
-  return plan.chunks.find((chunk) => chunk.offset === receivedBytes);
+  const length = Math.min(plan.chunkSize, plan.totalBytes - receivedBytes);
+  return { offset: receivedBytes, length, endExclusive: receivedBytes + length };
 }
 
 export interface ResumableUploadTransport {
