@@ -20,7 +20,7 @@ import {
 } from './workflowModel';
 import { workflowRepository } from './workflowRepository';
 
-type WorkspaceTab = 'overview' | 'diagnosis' | 'repair' | 'evidence' | 'quality';
+type WorkspaceTab = 'overview' | 'diagnosis' | 'repair' | 'evidence' | 'quality' | 'sync';
 
 const navigation = ['Workshop', 'Intake', 'Quality', 'Diagnostics'];
 const tabs: Array<{ id: WorkspaceTab; label: string }> = [
@@ -29,6 +29,7 @@ const tabs: Array<{ id: WorkspaceTab; label: string }> = [
   { id: 'repair', label: 'Repair actions' },
   { id: 'evidence', label: 'Evidence' },
   { id: 'quality', label: 'Quality review' },
+  { id: 'sync', label: 'Sync & conflicts' },
 ];
 
 export function App() {
@@ -309,6 +310,7 @@ export function App() {
                       onSave={(updated) => persist(updated, 'Quality review saved.')}
                     />
                   )}
+                  {activeTab === 'sync' && <SyncConflictPanel repairCase={selected} />}
                 </div>
               </motion.section>
             ) : (
@@ -333,6 +335,58 @@ export function App() {
           }}
         />
       )}
+    </div>
+  );
+}
+
+function SyncConflictPanel({ repairCase }: { repairCase: RepairCaseDetail }) {
+  const [summary, setSummary] = useState<{
+    pending: number;
+    conflicts: number;
+    failed: number;
+    cursor?: number;
+  }>({
+    pending: 0,
+    conflicts: 0,
+    failed: 0,
+  });
+
+  useEffect(() => {
+    let active = true;
+    void (
+      window.repairFlow?.getSyncSummary?.() ??
+      Promise.resolve({ pending: 0, conflicts: 0, failed: 0, cursor: 0 })
+    ).then((next) => active && setSummary(next));
+    return () => {
+      active = false;
+    };
+  }, [repairCase.id, repairCase.version]);
+
+  return (
+    <div className="overview-grid" data-testid="sync-conflict-centre">
+      <article className="detail-card">
+        <span className="card-kicker">PENDING OPERATIONS</span>
+        <strong>{summary.pending}</strong>
+      </article>
+      <article className="detail-card">
+        <span className="card-kicker">EXPLICIT CONFLICTS</span>
+        <strong>{summary.conflicts}</strong>
+      </article>
+      <article className="detail-card">
+        <span className="card-kicker">FAILED OPERATIONS</span>
+        <strong>{summary.failed}</strong>
+      </article>
+      <article className="detail-card">
+        <span className="card-kicker">DELTA CURSOR</span>
+        <strong>{summary.cursor ?? 'Not synced'}</strong>
+      </article>
+      <article className="next-action-card span-four">
+        <span>Conflict policy</span>
+        <strong>
+          Server versions are compared explicitly; conflicting fields remain reviewable before
+          retry.
+        </strong>
+      </article>
     </div>
   );
 }
