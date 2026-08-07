@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -152,7 +153,13 @@ public sealed class SyncCoordinator(
         CancellationToken cancellationToken)
     {
         if (request.EntityId == Guid.Empty) throw new ArgumentException("Entity id is required.");
-        if (request.Version < 1) throw new ArgumentOutOfRangeException(nameof(request.Version));
+        if (request.Version < 1)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(request),
+                request.Version,
+                "Tombstone version must be at least 1.");
+        }
 
         var change = SyncChange.Tombstone(request.EntityId, request.Version, timeProvider.GetUtcNow());
         await syncRepository.AddChangeAsync(change, cancellationToken);
@@ -236,7 +243,13 @@ public sealed class SyncCoordinator(
         {
             throw new ArgumentException($"Unsupported sync operation kind: {request.Kind}");
         }
-        if (request.BaseVersion is < 1) throw new ArgumentOutOfRangeException(nameof(request.BaseVersion));
+        if (request.BaseVersion is < 1)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(request),
+                request.BaseVersion,
+                "Base version must be at least 1 when supplied.");
+        }
         if (request.Kind == SyncOperationKinds.RepairCaseCreate)
         {
             _ = RequireRepairCaseId(request);
@@ -275,8 +288,8 @@ public sealed class SyncCoordinator(
         {
             new(
                 "aggregateVersion",
-                request.BaseVersion?.ToString(),
-                server.Version.ToString())
+                request.BaseVersion?.ToString(CultureInfo.InvariantCulture),
+                server.Version.ToString(CultureInfo.InvariantCulture))
         };
 
         if (request.Kind == SyncOperationKinds.StatusUpdate &&

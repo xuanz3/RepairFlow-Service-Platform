@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Security.Claims;
 using RepairFlow.Application;
@@ -36,7 +37,9 @@ public static class SyncEndpoints
                 GetActorId(principal),
                 request,
                 cancellationToken);
-            RepairFlowTelemetry.SyncOperations.Add(1, new("status", receipt.Status));
+            RepairFlowTelemetry.SyncOperations.Add(
+                1,
+                new KeyValuePair<string, object?>("status", receipt.Status));
             return Results.Ok(receipt);
         }
         catch (KeyNotFoundException exception)

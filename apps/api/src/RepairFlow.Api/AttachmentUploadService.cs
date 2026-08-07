@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using RepairFlow.Application;
 using RepairFlow.Domain;
@@ -50,7 +51,9 @@ public sealed class AttachmentUploadService(
             throw;
         }
 
-        RepairFlowTelemetry.UploadSessions.Add(1, new("state", "started"));
+        RepairFlowTelemetry.UploadSessions.Add(
+            1,
+            new KeyValuePair<string, object?>("state", "started"));
         return UploadSessionDto.FromDomain(session);
     }
 
@@ -152,7 +155,9 @@ public sealed class AttachmentUploadService(
         }
         session.Complete(timeProvider.GetUtcNow());
         await syncRepository.SaveChangesAsync(cancellationToken);
-        RepairFlowTelemetry.UploadSessions.Add(1, new("state", "completed"));
+        RepairFlowTelemetry.UploadSessions.Add(
+            1,
+            new KeyValuePair<string, object?>("state", "completed"));
         return UploadSessionDto.FromDomain(session);
     }
 
@@ -162,7 +167,9 @@ public sealed class AttachmentUploadService(
         session.Abort(timeProvider.GetUtcNow());
         await syncRepository.SaveChangesAsync(cancellationToken);
         File.Delete(ActivePath(session.Id));
-        RepairFlowTelemetry.UploadSessions.Add(1, new("state", "aborted"));
+        RepairFlowTelemetry.UploadSessions.Add(
+            1,
+            new KeyValuePair<string, object?>("state", "aborted"));
         return UploadSessionDto.FromDomain(session);
     }
 
