@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from pathlib import Path
 import json
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 required = [
@@ -29,7 +30,14 @@ assert 'operation.operationId' in desktop_store and "WHERE status = 'sending'" i
 assert 'operation.operationId' in mobile_store and "WHERE status = 'sending'" in mobile_store
 
 package = json.loads((ROOT / 'package.json').read_text())
-assert package['version'] == '0.6.0'
+
+
+def version_at_least(value: str, minimum: tuple[int, int, int]) -> bool:
+    parts = tuple(int(part) for part in value.split('.')[:3])
+    return parts >= minimum
+
+assert version_at_least(package['version'], (0, 6, 0)), 'Root version regressed below the Phase 3 baseline'
+
 for script in ['validate:phase3', 'validate:phase3-security', 'test:failure', 'measure:sync', 'verify:phase3']:
     assert script in package['scripts'], f'Missing package script: {script}'
 
@@ -88,7 +96,6 @@ for workflow_name, workflow_text in (
     assert sync_position < desktop_position, f'{workflow_name} must build sync-engine before desktop typecheck'
 
 readme = (ROOT / 'README.md').read_text()
-assert 'Current stage: **Phase 3 - Synchronisation Reliability and Operations**' in readme
-assert '| Phase 3 | Offline synchronisation, reliability, security and observability | Complete |' in readme
+assert re.search(r'^\| Phase 3 \| Offline synchronisation, reliability, security and observability \| Complete\s*\|$', readme, flags=re.MULTILINE), 'README must retain Phase 3 as Complete'
 
 print('Phase 3 repository validation passed.')
