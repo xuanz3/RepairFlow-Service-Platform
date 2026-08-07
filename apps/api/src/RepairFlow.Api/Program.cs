@@ -16,8 +16,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsEnvironment("Testing"))
 {
+    // Compute the database name once per test host so separate request scopes share
+    // the same in-memory store while different WebApplicationFactory instances remain isolated.
+    var testingDatabaseName = $"repairflow-api-tests-{Guid.NewGuid():N}";
     builder.Services.AddDbContext<RepairFlowDbContext>(options =>
-        options.UseInMemoryDatabase($"repairflow-api-tests-{Guid.NewGuid():N}"));
+        options.UseInMemoryDatabase(testingDatabaseName));
     builder.Services.AddScoped<IRepairCaseRepository, RepairCaseRepository>();
 }
 else

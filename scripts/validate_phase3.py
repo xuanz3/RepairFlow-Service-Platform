@@ -42,6 +42,14 @@ with (ROOT / 'infra/observability/grafana/dashboards/repairflow-sync-reliability
 assert dashboard['uid'] == 'repairflow-sync-reliability'
 assert len(dashboard['panels']) >= 5
 
+program = (ROOT / 'apps/api/src/RepairFlow.Api/Program.cs').read_text()
+sync_tests = (ROOT / 'apps/api/tests/RepairFlow.Api.Tests/SyncReliabilityTests.cs').read_text()
+assert 'var testingDatabaseName = $\"repairflow-api-tests-{Guid.NewGuid():N}\";' in program
+assert 'UseInMemoryDatabase(testingDatabaseName)' in program
+assert 'UseInMemoryDatabase($\"repairflow-api-tests-{Guid.NewGuid():N}\")' not in program
+assert 'await using (var createScope = _factory.Services.CreateAsyncScope())' in sync_tests
+assert 'await using var syncScope = _factory.Services.CreateAsyncScope();' in sync_tests
+
 readme = (ROOT / 'README.md').read_text()
 assert 'Current stage: **Phase 3 - Synchronisation Reliability and Operations**' in readme
 assert '| Phase 3 | Offline synchronisation, reliability, security and observability | Complete |' in readme

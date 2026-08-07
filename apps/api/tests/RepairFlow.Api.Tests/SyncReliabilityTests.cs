@@ -60,21 +60,28 @@ public sealed class SyncReliabilityTests : IClassFixture<RepairFlowApiFactory>
     [Fact]
     public async Task StaleMutationReturnsExplicitConflictAndDeltaChange()
     {
-        await using var scope = _factory.Services.CreateAsyncScope();
-        var workflows = scope.ServiceProvider.GetRequiredService<RepairCaseWorkflowService>();
-        var coordinator = scope.ServiceProvider.GetRequiredService<SyncCoordinator>();
+        RepairCaseDetailDto created;
+        await using (var createScope = _factory.Services.CreateAsyncScope())
+        {
+            var workflows = createScope.ServiceProvider.GetRequiredService<RepairCaseWorkflowService>();
+            created = await workflows.CreateAsync(
+                new CreateRepairCaseRequest(
+                    "Conflict Test",
+                    "Northstar",
+                    "Slate Pro",
+                    "Tablet",
+                    "SYNC-CONFLICT-001",
+                    "Synthetic touch fault.",
+                    "No visible cracks.",
+                    RepairPriority.Priority),
+                CancellationToken.None);
+        }
+
+        // Resolve a fresh request scope to prove the sync path reads committed state
+        // from the test store instead of depending on a previous EF change tracker.
+        await using var syncScope = _factory.Services.CreateAsyncScope();
+        var coordinator = syncScope.ServiceProvider.GetRequiredService<SyncCoordinator>();
         var actorId = Guid.NewGuid();
-        var created = await workflows.CreateAsync(
-            new CreateRepairCaseRequest(
-                "Conflict Test",
-                "Northstar",
-                "Slate Pro",
-                "Tablet",
-                "SYNC-CONFLICT-001",
-                "Synthetic touch fault.",
-                "No visible cracks.",
-                RepairPriority.Priority),
-            CancellationToken.None);
 
         var first = new SyncOperationRequest(
             Guid.NewGuid(),
