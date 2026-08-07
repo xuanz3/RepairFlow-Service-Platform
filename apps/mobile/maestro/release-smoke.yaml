@@ -1,0 +1,33 @@
+appId: com.xuanz3.repairflow.mobile
+---
+- launchApp:
+    clearState: true
+- assertVisible: 'Workshop intake'
+- assertVisible: 'Local queue protected'
+- tapOn:
+    id: 'mobile-new-intake'
+- assertVisible: 'New repair intake'
+- tapOn:
+    id: 'intake-customer'
+- inputText: 'Release Verification'
+- tapOn:
+    id: 'intake-manufacturer'
+- inputText: 'Orion'
+- tapOn:
+    id: 'intake-model'
+- inputText: 'Notebook 14'
+- tapOn:
+    id: 'intake-serial'
+- inputText: 'RELEASE-0001'
+- tapOn:
+    id: 'intake-fault'
+- inputText: 'Intermittent charging under connector movement.'
+- tapOn:
+    id: 'intake-condition'
+- inputText: 'No impact damage observed at intake.'
+- tapOn:
+    id: 'save-intake'
+- assertVisible: 'Release Verification'
+- stopApp
+- launchApp
+- assertVisible: 'Release Verification'
