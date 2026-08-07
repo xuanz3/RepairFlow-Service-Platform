@@ -42,4 +42,8 @@ with (ROOT / 'infra/observability/grafana/dashboards/repairflow-sync-reliability
 assert dashboard['uid'] == 'repairflow-sync-reliability'
 assert len(dashboard['panels']) >= 5
 
+readme = (ROOT / 'README.md').read_text()
+assert 'Current stage: **Phase 3 - Synchronisation Reliability and Operations**' in readme
+assert '| Phase 3 | Offline synchronisation, reliability, security and observability | Complete |' in readme
+
 print('Phase 3 repository validation passed.')

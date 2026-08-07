@@ -106,7 +106,7 @@ All example customers, devices, serial numbers and attachments are fictional or 
 | Phase 0 | Product definition, design direction and repository governance   | Complete |
 | Phase 1 | Platform foundation, backend, identity and shared contracts      | Complete |
 | Phase 2 | Desktop and mobile repair workflows                              | Complete |
-| Phase 3 | Offline synchronisation, reliability, security and observability | Planned  |
+| Phase 3 | Offline synchronisation, reliability, security and observability | Complete |
 | Phase 4 | Packaging, automated product media and the v1.0 release          | Planned  |
 
 ## Licence
