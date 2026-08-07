@@ -1,6 +1,6 @@
 {
   "name": "@repairflow/mobile",
-  "version": "0.4.0",
+  "version": "0.6.0",
   "private": true,
   "main": "expo-router/entry",
   "scripts": {
@@ -14,8 +14,11 @@
   },
   "dependencies": {
     "@expo/log-box": "55.0.13",
+    "@repairflow/api-client": "workspace:*",
     "@repairflow/contracts": "workspace:*",
     "@repairflow/design-tokens": "workspace:*",
+    "@repairflow/sync-engine": "workspace:*",
+    "@repairflow/validation": "workspace:*",
     "expo": "55.0.28",
     "expo-camera": "55.0.21",
     "expo-constants": "55.0.17",
@@ -29,8 +32,7 @@
     "react": "19.2.0",
     "react-native": "0.83.10",
     "react-native-safe-area-context": "5.6.2",
-    "react-native-screens": "4.23.0",
-    "@repairflow/validation": "workspace:*"
+    "react-native-screens": "4.23.0"
   },
   "devDependencies": {
     "@types/react": "~19.2.10"
