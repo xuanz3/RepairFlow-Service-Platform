@@ -2,7 +2,7 @@
 from pathlib import Path
 import json, os, re
 root=Path(__file__).resolve().parents[1]
-required=['scripts/validate_maestro_flows.py','tools/release/prepare-desktop-package.mjs','tools/verify/desktop-package-contract.mjs','tools/release/verify-mobile-native-contract.py','tools/release/build-metadata.mjs','tools/release/generate-checksums.mjs','tools/release/generate-sbom.mjs','tools/release/finalise-readme.mjs','tools/verify/release-bundle-contract.mjs','tools/media/capture-manifest.json','tools/media/compose-final-media.mjs','tools/media/insert-readme-media.mjs','apps/desktop/playwright.a11y.config.ts','apps/desktop/tests/a11y/workshop.a11y.spec.ts','apps/desktop/tests/media/product-media.e2e.ts','apps/mobile/maestro/release-smoke.yaml','apps/mobile/maestro/release-media-android.yaml','apps/mobile/maestro/release-media-ios.yaml','.github/workflows/phase4-release-candidate.yml']
+required=['apps/desktop/vitest.config.ts','scripts/validate_maestro_flows.py','tools/release/prepare-desktop-package.mjs','tools/verify/desktop-package-contract.mjs','tools/release/verify-mobile-native-contract.py','tools/release/build-metadata.mjs','tools/release/generate-checksums.mjs','tools/release/generate-sbom.mjs','tools/release/finalise-readme.mjs','tools/verify/release-bundle-contract.mjs','tools/media/capture-manifest.json','tools/media/compose-final-media.mjs','tools/media/insert-readme-media.mjs','apps/desktop/playwright.a11y.config.ts','apps/desktop/tests/a11y/workshop.a11y.spec.ts','apps/desktop/tests/media/product-media.e2e.ts','apps/mobile/maestro/release-smoke.yaml','apps/mobile/maestro/release-media-android.yaml','apps/mobile/maestro/release-media-ios.yaml','.github/workflows/phase4-release-candidate.yml']
 missing=[x for x in required if not (root/x).is_file()]; assert not missing, f'Missing Phase 4 files: {missing}'
 for rel in ['package.json','apps/desktop/package.json','apps/mobile/package.json']:
  data=json.loads((root/rel).read_text()); assert data['version']=='1.0.0', f'{rel} must be version 1.0.0'
@@ -30,6 +30,12 @@ for token in ['  electron-winstaller: true', '  sharp: true']:
 maestro_validator=(root/'scripts/validate_maestro_flows.py').read_text()
 for token in ['intake-and-diagnosis.yaml','release-smoke.yaml','release-media-android.yaml','release-media-ios.yaml','expected_mobile_captures']:
  assert token in maestro_validator, f'Maestro suite validator missing {token}'
+vitest_config=(root/'apps/desktop/vitest.config.ts').read_text()
+for token in ["include: ['src/**/*.test.{ts,tsx}']", "'tests/**'"]:
+ assert token in vitest_config, f'Desktop Vitest boundary missing {token}'
+for forbidden in ["tests/a11y", "tests/e2e", "tests/media"]:
+ assert forbidden not in vitest_config.replace("'tests/**'", ""), f'Vitest must not collect Playwright suite: {forbidden}'
+
 workflow=(root/'.github/workflows/phase4-release-candidate.yml').read_text()
 assert 'head -n 1' not in workflow, 'Phase 4 workflow must not use early-exit head pipelines under GitHub Actions pipefail'
 for token in ['desktop-package','android-package','ios-package','desktop-media','aggregate-release']:
