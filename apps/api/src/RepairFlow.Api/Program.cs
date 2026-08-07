@@ -3,6 +3,9 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using RepairFlow.Api;
 using RepairFlow.Application;
 using RepairFlow.Infrastructure;
@@ -21,6 +24,8 @@ else
 {
     builder.Services.AddRepairFlowInfrastructure(builder.Configuration);
 }
+
+builder.Services.AddScoped<ISyncRepository, SyncRepository>();
 
 builder.Services
     .AddIdentityApiEndpoints<ApplicationUser>(options =>
@@ -44,7 +49,10 @@ builder.Services.AddAuthorizationBuilder()
         policy => policy.RequireRole("Admin", "Technician"))
     .AddPolicy(
         "QualityTeam",
-        policy => policy.RequireRole("Admin", "Quality"));
+        policy => policy.RequireRole("Admin", "Quality"))
+    .AddPolicy(
+        "AdminOnly",
+        policy => policy.RequireRole("Admin"));
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
@@ -56,10 +64,40 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<RepairCaseQueries>();
 builder.Services.AddScoped<RepairCaseWorkflowService>();
+builder.Services.AddScoped<SyncCoordinator>();
+builder.Services.AddScoped<AttachmentUploadService>();
 builder.Services.AddHealthChecks().AddDbContextCheck<RepairFlowDbContext>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddProblemDetails();
+
+var otlpEndpoint = builder.Configuration["OpenTelemetry:OtlpEndpoint"];
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService(
+        serviceName: "RepairFlow.Api",
+        serviceVersion: "0.6.0"))
+    .WithTracing(tracing =>
+    {
+        tracing
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddSource(RepairFlowTelemetry.ActivitySourceName);
+        if (Uri.TryCreate(otlpEndpoint, UriKind.Absolute, out var endpoint))
+        {
+            tracing.AddOtlpExporter(options => options.Endpoint = endpoint);
+        }
+    })
+    .WithMetrics(metrics =>
+    {
+        metrics
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddMeter(RepairFlowTelemetry.MeterName);
+        if (Uri.TryCreate(otlpEndpoint, UriKind.Absolute, out var endpoint))
+        {
+            metrics.AddOtlpExporter(options => options.Endpoint = endpoint);
+        }
+    });
 
 var app = builder.Build();
 
@@ -82,13 +120,15 @@ app.MapGet("/health/live", () => Results.Ok(new
 {
     service = "RepairFlow.Api",
     status = "healthy",
-    version = typeof(Program).Assembly.GetName().Version?.ToString() ?? "0.4.0",
+    version = typeof(Program).Assembly.GetName().Version?.ToString() ?? "0.6.0",
     timestamp = DateTimeOffset.UtcNow
 })).AllowAnonymous();
 
 app.MapHealthChecks("/health/ready");
 app.MapGroup("/api/auth").MapIdentityApi<ApplicationUser>();
 app.MapRepairCaseEndpoints();
+app.MapSyncEndpoints();
+app.MapAttachmentUploadEndpoints();
 
 if (!app.Environment.IsEnvironment("Testing"))
 {
