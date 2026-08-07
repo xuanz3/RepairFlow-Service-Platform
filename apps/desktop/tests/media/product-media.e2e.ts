@@ -6,12 +6,15 @@ const out = resolve(process.env.REPAIRFLOW_MEDIA_OUTPUT ?? '../../artifacts/medi
 test('captures deterministic desktop product states from Electron', async () => {
   await mkdir(out, { recursive: true });
   const app = await electron.launch({
-    args: ['.'],
+    args:
+      process.platform === 'linux' && process.env.CI ? ['--no-sandbox', '.'] : ['.'],
     cwd: resolve('.'),
     env: { ...process.env, REPAIRFLOW_CAPTURE_MODE: '1' },
   });
   const page = await app.firstWindow();
+  await page.waitForLoadState('domcontentloaded');
   await page.setViewportSize({ width: 1480, height: 940 });
+  await expect(page.getByTestId('new-intake')).toBeVisible({ timeout: 15000 });
   await expect(page.getByRole('heading', { name: 'Repair operations' })).toBeVisible();
   await page.getByRole('button', { name: 'Reset preview' }).click();
   await page.screenshot({
