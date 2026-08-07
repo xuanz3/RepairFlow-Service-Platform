@@ -1,14 +1,19 @@
 import type {
+  BeginUploadRequest,
   CompleteRepairActionRequest,
   CreateEvidenceRequest,
   CreateRepairActionRequest,
   CreateRepairCaseRequest,
+  DeltaPage,
   HealthResponse,
   RecordDiagnosisRequest,
   RepairCaseDetail,
   RepairCaseSummary,
   SubmitQualityReviewRequest,
+  SyncOperationEnvelope,
+  SyncOperationReceipt,
   UpdateRepairStatusRequest,
+  UploadSessionInfo,
 } from '@repairflow/contracts';
 
 export interface RepairFlowClientOptions {
@@ -119,6 +124,59 @@ export class RepairFlowClient {
     return this.request<RepairCaseDetail>(`/api/repair-cases/${id}/status`, {
       method: 'POST',
       body: JSON.stringify(input),
+      signal,
+    });
+  }
+
+  public applySyncOperation(
+    operation: SyncOperationEnvelope,
+    signal?: AbortSignal,
+  ): Promise<SyncOperationReceipt> {
+    return this.request<SyncOperationReceipt>('/api/sync/operations', {
+      method: 'POST',
+      body: JSON.stringify(operation),
+      signal,
+    });
+  }
+
+  public pullDelta(cursor?: number, limit = 100, signal?: AbortSignal): Promise<DeltaPage> {
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (cursor !== undefined) params.set('cursor', String(cursor));
+    return this.request<DeltaPage>(`/api/sync/delta?${params.toString()}`, { signal });
+  }
+
+  public beginUpload(input: BeginUploadRequest, signal?: AbortSignal): Promise<UploadSessionInfo> {
+    return this.request<UploadSessionInfo>('/api/attachments/uploads', {
+      method: 'POST',
+      body: JSON.stringify(input),
+      signal,
+    });
+  }
+
+  public getUpload(sessionId: string, signal?: AbortSignal): Promise<UploadSessionInfo> {
+    return this.request<UploadSessionInfo>(`/api/attachments/uploads/${sessionId}`, { signal });
+  }
+
+  public uploadChunk(
+    sessionId: string,
+    offset: number,
+    chunk: Uint8Array,
+    signal?: AbortSignal,
+  ): Promise<UploadSessionInfo> {
+    return this.request<UploadSessionInfo>(
+      `/api/attachments/uploads/${sessionId}?offset=${offset}`,
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/octet-stream' },
+        body: chunk as unknown as BodyInit,
+        signal,
+      },
+    );
+  }
+
+  public completeUpload(sessionId: string, signal?: AbortSignal): Promise<UploadSessionInfo> {
+    return this.request<UploadSessionInfo>(`/api/attachments/uploads/${sessionId}/complete`, {
+      method: 'POST',
       signal,
     });
   }
