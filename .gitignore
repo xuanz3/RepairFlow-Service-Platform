@@ -25,3 +25,5 @@ blob-report/
 apps/desktop/.release-package/
 apps/desktop/release/
 apps/mobile/build/
+!tools/release/
+!tools/release/**

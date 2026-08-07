@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from pathlib import Path
 import json, os, re
+import subprocess
 root=Path(__file__).resolve().parents[1]
 required=['apps/desktop/vitest.config.ts','scripts/validate_maestro_flows.py','tools/release/prepare-desktop-package.mjs','tools/verify/desktop-package-contract.mjs','tools/release/verify-mobile-native-contract.py','tools/release/build-metadata.mjs','tools/release/generate-checksums.mjs','tools/release/generate-sbom.mjs','tools/release/finalise-readme.mjs','tools/verify/release-bundle-contract.mjs','tools/media/capture-manifest.json','tools/media/compose-final-media.mjs','tools/media/insert-readme-media.mjs','apps/desktop/playwright.a11y.config.ts','apps/desktop/tests/a11y/workshop.a11y.spec.ts','apps/desktop/tests/media/product-media.e2e.ts','apps/mobile/maestro/release-smoke.yaml','apps/mobile/maestro/release-media-android.yaml','apps/mobile/maestro/release-media-ios.yaml','.github/workflows/phase4-release-candidate.yml']
 missing=[x for x in required if not (root/x).is_file()]; assert not missing, f'Missing Phase 4 files: {missing}'
@@ -40,4 +41,12 @@ workflow=(root/'.github/workflows/phase4-release-candidate.yml').read_text()
 assert 'head -n 1' not in workflow, 'Phase 4 workflow must not use early-exit head pipelines under GitHub Actions pipefail'
 for token in ['desktop-package','android-package','ios-package','desktop-media','aggregate-release']:
  assert token in workflow, f'Phase 4 workflow missing {token}'
+release_helpers=['tools/release/prepare-desktop-package.mjs','tools/release/verify-mobile-native-contract.py','tools/release/build-metadata.mjs','tools/release/generate-checksums.mjs','tools/release/generate-sbom.mjs','tools/release/finalise-readme.mjs']
+ignore_text=(root/'.gitignore').read_text()
+for token in ['!tools/release/','!tools/release/**']:
+ assert token in ignore_text.splitlines(), f'.gitignore must explicitly retain release helper source: {token}'
+tracked=set(subprocess.check_output(['git','ls-files'], cwd=root, text=True).splitlines())
+for rel in release_helpers:
+ assert rel in tracked, f'Phase 4 release helper must be tracked by Git: {rel}'
+
 print('Phase 4 release and media validation passed.')
