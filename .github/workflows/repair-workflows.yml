@@ -126,8 +126,8 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm --dir apps/mobile exec expo install --check
-      - run: pnpm --filter @repairflow/mobile typecheck
-      - run: pnpm --filter @repairflow/mobile test
+      - run: pnpm exec turbo run typecheck --filter=@repairflow/mobile
+      - run: pnpm exec turbo run test --filter=@repairflow/mobile
       - run: python3 scripts/validate_maestro_flows.py
 
   local-service-contract:

@@ -62,6 +62,19 @@ mobile_manifest = json.loads((ROOT / "apps/mobile/package.json").read_text(encod
 if mobile_manifest.get("version") != "0.4.0":
     errors.append("Mobile preview package version must be 0.4.0.")
 
+platform_workflow = (ROOT / ".github/workflows/platform-foundation.yml").read_text(encoding="utf-8")
+repair_workflow = (ROOT / ".github/workflows/repair-workflows.yml").read_text(encoding="utf-8")
+mobile_turbo_typecheck = "pnpm exec turbo run typecheck --filter=@repairflow/mobile"
+if mobile_turbo_typecheck not in platform_workflow:
+    errors.append("Platform Foundation must typecheck mobile through the Turborepo dependency graph.")
+if mobile_turbo_typecheck not in repair_workflow:
+    errors.append("Repair Workflows must typecheck mobile through the Turborepo dependency graph.")
+if "pnpm exec turbo run test --filter=@repairflow/mobile" not in repair_workflow:
+    errors.append("Repair Workflows must test mobile through the Turborepo dependency graph.")
+for workflow_name, workflow_text in (("Platform Foundation", platform_workflow), ("Repair Workflows", repair_workflow)):
+    if "pnpm --filter @repairflow/mobile typecheck" in workflow_text:
+        errors.append(f"{workflow_name} must not invoke raw mobile typecheck before workspace dependency builds.")
+
 playwright_config = (ROOT / "apps/desktop/playwright.config.ts").read_text(encoding="utf-8")
 for token in (
     "process.execPath",
