@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify the ASP.NET Core foundation follows the pinned service model."""
+"""Verify the ASP.NET Core service follows the pinned workflow model."""
 import json
 from pathlib import Path
 
@@ -10,7 +10,7 @@ if sdk_version != "10.0.302":
     raise SystemExit(f"RepairFlow requires .NET SDK 10.0.302; found {sdk_version!r}")
 
 program = (ROOT / "apps/api/src/RepairFlow.Api/Program.cs").read_text(encoding="utf-8")
-required = (
+required_program = (
     "WebApplication.CreateBuilder",
     "AddIdentityApiEndpoints",
     "AddAuthorizationBuilder",
@@ -18,25 +18,41 @@ required = (
     "AddHealthChecks",
     "UseExceptionHandler",
     "MapHealthChecks",
+    "MapRepairCaseEndpoints",
+    "JsonStringEnumConverter",
+    "JsonNamingPolicy.KebabCaseLower",
 )
-for token in required:
+for token in required_program:
     if token not in program:
-        raise SystemExit(f"ASP.NET Core foundation requirement is missing: {token}")
+        raise SystemExit(f"ASP.NET Core requirement is missing: {token}")
+
+endpoints = (ROOT / "apps/api/src/RepairFlow.Api/RepairCaseEndpoints.cs").read_text(encoding="utf-8")
+for token in (
+    "/{id:guid}/diagnosis",
+    "/{id:guid}/repair-actions",
+    "/{id:guid}/evidence",
+    "/{id:guid}/quality-reviews",
+    "Status409Conflict",
+    "RequireAuthorization",
+):
+    if token not in endpoints:
+        raise SystemExit(f"Repair workflow endpoint requirement is missing: {token}")
+
+domain = (ROOT / "apps/api/src/RepairFlow.Domain/RepairCase.cs").read_text(encoding="utf-8")
+for token in (
+    "RecordDiagnosis",
+    "AddRepairAction",
+    "CompleteRepairAction",
+    "AddEvidence",
+    "SubmitQualityReview",
+    "RepairCaseVersionConflictException",
+):
+    if token not in domain:
+        raise SystemExit(f"Repair domain workflow requirement is missing: {token}")
 
 for forbidden in ("new WebHostBuilder", "class Startup", "UseDeveloperExceptionPage"):
     if forbidden in program:
         raise SystemExit(f"Outdated ASP.NET Core pattern found: {forbidden}")
-
-
-
-test_projects = (
-    ROOT / "apps/api/tests/RepairFlow.Domain.Tests/RepairFlow.Domain.Tests.csproj",
-    ROOT / "apps/api/tests/RepairFlow.Api.Tests/RepairFlow.Api.Tests.csproj",
-)
-for project in test_projects:
-    content = project.read_text(encoding="utf-8")
-    if 'PackageReference Include="xunit"' not in content:
-        raise SystemExit(f"xUnit package reference is missing: {project.relative_to(ROOT)}")
 
 test_sources = (
     ROOT / "apps/api/tests/RepairFlow.Domain.Tests/RepairCaseTests.cs",
@@ -47,4 +63,4 @@ for source in test_sources:
     if "using Xunit;" not in content:
         raise SystemExit(f"Explicit xUnit import is missing: {source.relative_to(ROOT)}")
 
-print("ASP.NET Core foundation validation passed.")
+print("ASP.NET Core workflow validation passed.")

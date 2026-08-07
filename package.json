@@ -1,6 +1,6 @@
 {
   "name": "repairflow-service-platform",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "private": true,
   "packageManager": "pnpm@11.9.0",
   "engines": {
@@ -9,14 +9,18 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
+    "e2e:desktop": "pnpm --filter @repairflow/desktop e2e",
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
-    "validate:repo": "python3 scripts/validate_repository.py",
+    "validate:frameworks": "python3 scripts/validate_framework_gates.py",
+    "validate:maestro": "python3 scripts/validate_maestro_flows.py",
     "validate:phase1": "python3 scripts/validate_phase1.py",
-    "verify": "pnpm validate:repo && pnpm validate:phase1 && pnpm validate:frameworks && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
-    "validate:frameworks": "python3 scripts/validate_framework_gates.py"
+    "validate:phase2": "python3 scripts/validate_phase2.py",
+    "validate:repo": "python3 scripts/validate_repository.py",
+    "verify": "pnpm validate:repo && pnpm validate:phase1 && pnpm validate:phase2 && pnpm validate:frameworks && pnpm validate:maestro && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "verify:phase2": "pnpm verify && pnpm e2e:desktop"
   },
   "devDependencies": {
     "@eslint/js": "9.39.2",
