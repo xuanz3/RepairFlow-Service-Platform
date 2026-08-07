@@ -50,6 +50,26 @@ assert 'UseInMemoryDatabase($\"repairflow-api-tests-{Guid.NewGuid():N}\")' not i
 assert 'await using (var createScope = _factory.Services.CreateAsyncScope())' in sync_tests
 assert 'await using var syncScope = _factory.Services.CreateAsyncScope();' in sync_tests
 
+# RepairFlow creates aggregate and sync GUIDs in the application. EF Core must not
+# interpret non-default application-generated keys as database-generated existing rows.
+db_context = (ROOT / 'apps/api/src/RepairFlow.Infrastructure/Persistence/RepairFlowDbContext.cs').read_text()
+for entity, key in {
+    'RepairCase': 'Id',
+    'DeviceAsset': 'Id',
+    'DiagnosisRecord': 'Id',
+    'RepairAction': 'Id',
+    'EvidenceItem': 'Id',
+    'QualityReview': 'Id',
+    'AuditEntry': 'Id',
+    'SyncOperationRecord': 'OperationId',
+    'AttachmentUploadSession': 'Id',
+}.items():
+    start = db_context.index(f'builder.Entity<{entity}>(entity =>')
+    next_entity = db_context.find('builder.Entity<', start + 1)
+    block = db_context[start: next_entity if next_entity >= 0 else len(db_context)]
+    expected = f'entity.Property(item => item.{key}).ValueGeneratedNever();'
+    assert expected in block, f'{entity}.{key} must be configured as application-generated'
+
 readme = (ROOT / 'README.md').read_text()
 assert 'Current stage: **Phase 3 - Synchronisation Reliability and Operations**' in readme
 assert '| Phase 3 | Offline synchronisation, reliability, security and observability | Complete |' in readme
