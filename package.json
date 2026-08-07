@@ -1,6 +1,6 @@
 {
   "name": "repairflow-service-platform",
-  "version": "0.4.0",
+  "version": "0.6.0",
   "private": true,
   "packageManager": "pnpm@11.9.0",
   "engines": {
@@ -18,9 +18,14 @@
     "validate:maestro": "python3 scripts/validate_maestro_flows.py",
     "validate:phase1": "python3 scripts/validate_phase1.py",
     "validate:phase2": "python3 scripts/validate_phase2.py",
+    "validate:phase3": "python3 scripts/validate_phase3.py",
+    "validate:phase3-security": "python3 scripts/validate_phase3_security.py",
     "validate:repo": "python3 scripts/validate_repository.py",
-    "verify": "python3 scripts/validate_repository.py && python3 scripts/validate_phase1.py && python3 scripts/validate_phase2.py && python3 scripts/validate_framework_gates.py && python3 scripts/validate_maestro_flows.py && prettier --check . && eslint . && turbo run typecheck && turbo run test && turbo run build",
-    "verify:phase2": "npm run verify && npm run e2e:desktop"
+    "test:failure": "node tools/verify/phase3-failure-scenarios.mjs",
+    "measure:sync": "node tools/verify/measure-sync-engine.mjs",
+    "verify": "python3 scripts/validate_repository.py && python3 scripts/validate_phase1.py && python3 scripts/validate_phase2.py && python3 scripts/validate_phase3.py && python3 scripts/validate_phase3_security.py && python3 scripts/validate_framework_gates.py && python3 scripts/validate_maestro_flows.py && prettier --check . && eslint . && turbo run typecheck && turbo run test && turbo run build",
+    "verify:phase2": "npm run verify && npm run e2e:desktop",
+    "verify:phase3": "npm run verify && npm run test:failure && npm run measure:sync"
   },
   "devDependencies": {
     "@eslint/js": "9.39.2",

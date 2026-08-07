@@ -64,8 +64,30 @@ public sealed class RepairCase
         ArgumentException.ThrowIfNullOrWhiteSpace(customerDisplayName);
         ArgumentException.ThrowIfNullOrWhiteSpace(reportedFault);
 
-        return new RepairCase(
+        return CreateWithId(
             Guid.CreateVersion7(),
+            reference,
+            customerDisplayName,
+            reportedFault,
+            priority,
+            now);
+    }
+
+    public static RepairCase CreateWithId(
+        Guid id,
+        string reference,
+        string customerDisplayName,
+        string reportedFault,
+        RepairPriority priority,
+        DateTimeOffset now)
+    {
+        if (id == Guid.Empty) throw new ArgumentException("Repair case id is required.", nameof(id));
+        ArgumentException.ThrowIfNullOrWhiteSpace(reference);
+        ArgumentException.ThrowIfNullOrWhiteSpace(customerDisplayName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(reportedFault);
+
+        return new RepairCase(
+            id,
             reference.Trim(),
             customerDisplayName.Trim(),
             reportedFault.Trim(),

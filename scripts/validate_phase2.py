@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Validate RepairFlow Phase 2 workflow scope and release contracts."""
+"""Validate retained RepairFlow Phase 2 workflow capabilities across later releases."""
 from __future__ import annotations
 
 import json
 from pathlib import Path
+import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,9 +35,24 @@ for relative in required_files:
     if not (ROOT / relative).exists():
         errors.append(f"Missing Phase 2 file: {relative}")
 
+
+def release_version(value: object, label: str) -> tuple[int, int, int] | None:
+    match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)(?:[-+].*)?", str(value or ""))
+    if not match:
+        errors.append(f"{label} has an invalid semantic version: {value!r}")
+        return None
+    return tuple(int(part) for part in match.groups())
+
+
+def require_version_at_least(value: object, minimum: tuple[int, int, int], label: str) -> None:
+    parsed = release_version(value, label)
+    if parsed is not None and parsed < minimum:
+        minimum_text = ".".join(str(part) for part in minimum)
+        errors.append(f"{label} must remain at or beyond the Phase 2 baseline {minimum_text}.")
+
+
 root_manifest = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
-if root_manifest.get("version") != "0.4.0":
-    errors.append("Root package version must be 0.4.0 during Phase 2.")
+require_version_at_least(root_manifest.get("version"), (0, 4, 0), "Root package version")
 root_scripts = root_manifest.get("scripts", {})
 verify_script = str(root_scripts.get("verify", ""))
 for forbidden in (
@@ -50,17 +66,16 @@ for forbidden in (
     if forbidden in verify_script:
         errors.append(f"Root verify script must not recursively resolve pnpm from PATH: {forbidden}")
 if "python3 scripts/validate_phase2.py" not in verify_script or "turbo run build" not in verify_script:
-    errors.append("Root verify script does not expose the complete self-contained Phase 2 gate.")
+    errors.append("Root verify script does not retain the self-contained Phase 2 capability gate.")
 if root_scripts.get("e2e:desktop") != "npm --prefix apps/desktop run e2e":
     errors.append("Desktop e2e runner must execute from the desktop package without nested pnpm lookup.")
 if root_scripts.get("verify:phase2") != "npm run verify && npm run e2e:desktop":
     errors.append("Phase 2 verification runner must compose the self-contained verify and desktop e2e scripts.")
+
 desktop_manifest = json.loads((ROOT / "apps/desktop/package.json").read_text(encoding="utf-8"))
-if desktop_manifest.get("version") != "0.3.0":
-    errors.append("Desktop preview package version must be 0.3.0.")
+require_version_at_least(desktop_manifest.get("version"), (0, 3, 0), "Desktop package version")
 mobile_manifest = json.loads((ROOT / "apps/mobile/package.json").read_text(encoding="utf-8"))
-if mobile_manifest.get("version") != "0.4.0":
-    errors.append("Mobile preview package version must be 0.4.0.")
+require_version_at_least(mobile_manifest.get("version"), (0, 4, 0), "Mobile package version")
 
 platform_workflow = (ROOT / ".github/workflows/platform-foundation.yml").read_text(encoding="utf-8")
 repair_workflow = (ROOT / ".github/workflows/repair-workflows.yml").read_text(encoding="utf-8")
@@ -90,14 +105,14 @@ for forbidden_command in ("pnpm build", "pnpm preview"):
 
 readme = (ROOT / "README.md").read_text(encoding="utf-8")
 for token in (
-    "Phase 2 - Desktop and Mobile Repair Workflows",
+    "Desktop workshop queue",
     "Electron SQLite workflow store",
     "Expo Camera",
     "Playwright",
     "Maestro",
 ):
     if token not in readme:
-        errors.append(f"README Phase 2 contract is missing: {token}")
+        errors.append(f"README no longer documents retained Phase 2 capability: {token}")
 
 for forbidden in (
     "port" + "folio",
@@ -113,4 +128,4 @@ if errors:
         print(f"ERROR: {error}", file=sys.stderr)
     raise SystemExit(1)
 
-print("Phase 2 repository validation passed.")
+print("Phase 2 retained-capability validation passed.")

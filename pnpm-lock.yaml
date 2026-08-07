@@ -44,6 +44,9 @@ importers:
       '@repairflow/design-tokens':
         specifier: workspace:*
         version: link:../../packages/design-tokens
+      '@repairflow/sync-engine':
+        specifier: workspace:*
+        version: link:../../packages/sync-engine
       motion:
         specifier: 12.43.0
         version: 12.43.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -90,12 +93,18 @@ importers:
       '@expo/log-box':
         specifier: 55.0.13
         version: 55.0.13(@expo/dom-webview@56.0.6)(expo@55.0.28)(react-native@0.83.10(@babel/core@7.29.7)(@types/react@19.2.18)(react@19.2.0))(react@19.2.0)
+      '@repairflow/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
       '@repairflow/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
       '@repairflow/design-tokens':
         specifier: workspace:*
         version: link:../../packages/design-tokens
+      '@repairflow/sync-engine':
+        specifier: workspace:*
+        version: link:../../packages/sync-engine
       '@repairflow/validation':
         specifier: workspace:*
         version: link:../../packages/validation
@@ -155,6 +164,12 @@ importers:
   packages/contracts: {}
 
   packages/design-tokens: {}
+
+  packages/sync-engine:
+    dependencies:
+      '@repairflow/contracts':
+        specifier: workspace:*
+        version: link:../contracts
 
   packages/validation:
     dependencies:

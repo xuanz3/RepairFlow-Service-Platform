@@ -2,7 +2,7 @@
 
 RepairFlow is an offline-first repair operations platform for electronics service teams. It connects mobile device intake and evidence capture with a desktop workshop workspace and an ASP.NET Core service.
 
-> Current stage: **Phase 2 - Desktop and Mobile Repair Workflows**
+> Current stage: **Phase 3 - Synchronisation Reliability and Operations**
 
 ## Core workflow
 
@@ -23,6 +23,9 @@ Product media will be inserted by the validated capture pipeline in Phase 4.
 - Diagnosis, repair actions, evidence and quality review on both clients
 - ASP.NET Core workflow endpoints with role policies and version checks
 - Playwright desktop end-to-end validation and Maestro mobile flow contracts
+- Durable desktop/mobile outboxes with idempotent service replay and delta pull
+- Resumable SHA-256 verified evidence uploads with explicit recovery states
+- OpenTelemetry metrics/traces with an opt-in local Prometheus/Grafana profile
 
 ## Platform
 
@@ -43,6 +46,7 @@ Product media will be inserted by the validated capture pipeline in Phase 4.
 - Expo Camera, FileSystem, Crypto and SecureStore for mobile capture boundaries
 - pnpm workspaces and Turborepo for the shared TypeScript workspace
 - xUnit, Vitest, Playwright and Maestro for workflow validation
+- OpenTelemetry, Prometheus and Grafana for reliability telemetry
 - GitHub Actions for validation, cross-platform builds and release checks
 
 ## Repository structure
@@ -102,7 +106,7 @@ All example customers, devices, serial numbers and attachments are fictional or 
 | Phase 0 | Product definition, design direction and repository governance   | Complete |
 | Phase 1 | Platform foundation, backend, identity and shared contracts      | Complete |
 | Phase 2 | Desktop and mobile repair workflows                              | Complete |
-| Phase 3 | Offline synchronisation, reliability, security and observability | Planned  |
+| Phase 3 | Offline synchronisation, reliability, security and observability | Complete |
 | Phase 4 | Packaging, automated product media and the v1.0 release          | Planned  |
 
 ## Licence

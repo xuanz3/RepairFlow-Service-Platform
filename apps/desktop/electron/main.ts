@@ -3,11 +3,19 @@ import { copyFileSync, mkdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
-import type { EvidenceMetadata, RepairCaseDetail } from '@repairflow/contracts';
+import type {
+  DeltaPage,
+  EvidenceMetadata,
+  RepairCaseDetail,
+  SyncOperationEnvelope,
+} from '@repairflow/contracts';
+import type { OutboxItem } from '@repairflow/sync-engine';
+import { DurableSyncStore } from './syncStore.js';
 import { LocalWorkflowStore } from './workflowStore.js';
 
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 let store: LocalWorkflowStore | undefined;
+let syncStore: DurableSyncStore | undefined;
 
 function createWindow(): void {
   const window = new BrowserWindow({
@@ -80,6 +88,23 @@ function registerWorkflowIpc(workflowStore: LocalWorkflowStore): void {
   });
 }
 
+function registerSyncIpc(reliabilityStore: DurableSyncStore): void {
+  ipcMain.handle('workflow:delete', (_event, id: string) => store?.delete(id) ?? false);
+  ipcMain.handle('sync:queue', (_event, operation: SyncOperationEnvelope) =>
+    reliabilityStore.queue(operation),
+  );
+  ipcMain.handle('sync:list-ready', (_event, now: string, limit: number) =>
+    reliabilityStore.listReadySync(now, limit),
+  );
+  ipcMain.handle('sync:save', (_event, item: OutboxItem) => reliabilityStore.saveSync(item));
+  ipcMain.handle('sync:get-cursor', () => reliabilityStore.getCursor());
+  ipcMain.handle('sync:set-cursor', (_event, cursor: number) => reliabilityStore.setCursor(cursor));
+  ipcMain.handle('sync:record-delta', (_event, page: DeltaPage) =>
+    reliabilityStore.recordDelta(page),
+  );
+  ipcMain.handle('sync:summary', () => reliabilityStore.summary());
+}
+
 function mimeTypeFor(extension: string): string {
   switch (extension) {
     case '.jpg':
@@ -98,7 +123,9 @@ function mimeTypeFor(extension: string): string {
 
 app.whenReady().then(() => {
   store = new LocalWorkflowStore(path.join(app.getPath('userData'), 'repairflow-workflows.sqlite'));
+  syncStore = new DurableSyncStore(path.join(app.getPath('userData'), 'repairflow-sync.sqlite'));
   registerWorkflowIpc(store);
+  registerSyncIpc(syncStore);
   createWindow();
 
   app.on('activate', () => {
@@ -108,7 +135,9 @@ app.whenReady().then(() => {
 
 app.on('before-quit', () => {
   store?.close();
+  syncStore?.close();
   store = undefined;
+  syncStore = undefined;
 });
 
 app.on('window-all-closed', () => {
