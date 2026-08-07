@@ -30,7 +30,8 @@
     "release:checksums": "node tools/release/generate-checksums.mjs",
     "release:sbom": "node tools/release/generate-sbom.mjs",
     "release:verify": "node tools/verify/release-bundle-contract.mjs",
-    "media:compose": "node tools/media/compose-final-media.mjs"
+    "media:compose": "node tools/media/compose-final-media.mjs",
+    "media:insert": "node tools/media/insert-readme-media.mjs"
   },
   "devDependencies": {
     "@eslint/js": "9.39.2",
