@@ -44,6 +44,7 @@ for token in ["getByTestId('new-intake')", "process.platform === 'linux' && proc
  assert token in media_test, f'Desktop Electron media capture missing production readiness token: {token}'
 package_contract=(root/'tools/verify/desktop-package-contract.mjs').read_text()
 assert 'Production Electron renderer must use relative Vite asset URLs.' in package_contract, 'Desktop package contract must verify file-safe renderer assets'
+assert '=\\"\/assets' not in package_contract, 'Desktop package contract regex must not contain a useless escaped quote'
 
 media_config=(root/'apps/desktop/playwright.media.config.ts').read_text()
 assert "testDir: './tests/media'" in media_config, 'Desktop media Playwright config must target tests/media'

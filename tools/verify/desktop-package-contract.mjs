@@ -9,7 +9,7 @@ for (const path of [
   if (!existsSync(resolve(root, path))) throw new Error(`Missing desktop package input: ${path}`);
 }
 const renderer = readFileSync(resolve(root, 'apps/desktop/dist/index.html'), 'utf8');
-if (/\b(?:src|href)=\"\/assets\//.test(renderer) || !renderer.includes('./assets/'))
+if (/\b(?:src|href)="\/assets\//.test(renderer) || !renderer.includes('./assets/'))
   throw new Error('Production Electron renderer must use relative Vite asset URLs.');
 const manifest = JSON.parse(
   readFileSync(resolve(root, 'apps/desktop/.release-package/package.json'), 'utf8'),
