@@ -1,0 +1,10 @@
+flowchart LR
+  M[Mobile · Expo] -->|offline outbox| S[Sync API · ASP.NET Core]
+  D[Desktop · Electron] -->|offline outbox| S
+  M --> LM[(SQLite + evidence vault)]
+  D --> LD[(SQLite + evidence vault)]
+  S --> P[(PostgreSQL)]
+  S --> A[(Azurite / object storage)]
+  S --> O[OpenTelemetry]
+  O --> PR[Prometheus]
+  PR --> G[Grafana]
