@@ -22,3 +22,6 @@ playwright-report/
 test-results/
 blob-report/
 .repairflow/
+apps/desktop/.release-package/
+apps/desktop/release/
+apps/mobile/build/
