@@ -79,6 +79,7 @@ function ManualEntry({
     <View style={local.manualCard}>
       <Text style={styles.label}>MANUAL FALLBACK</Text>
       <TextInput
+        testID="mobile-manual-serial"
         style={styles.input}
         value={value}
         onChangeText={onChange}
@@ -86,7 +87,11 @@ function ManualEntry({
         placeholder="Enter serial number"
         placeholderTextColor="#667084"
       />
-      <Pressable style={styles.secondaryButton} onPress={() => onUse(value)}>
+      <Pressable
+        testID="mobile-use-serial"
+        style={styles.secondaryButton}
+        onPress={() => onUse(value)}
+      >
         <Text style={styles.secondaryButtonText}>Use serial number</Text>
       </Pressable>
     </View>

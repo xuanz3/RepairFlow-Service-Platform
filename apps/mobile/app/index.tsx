@@ -64,6 +64,7 @@ export default function HomeScreen() {
               <Text style={styles.primaryButtonText}>New intake</Text>
             </Pressable>
             <Pressable
+              testID="mobile-scan-qr"
               style={[styles.secondaryButton, { flex: 1 }]}
               onPress={() => router.push('/scan')}
             >
@@ -94,6 +95,7 @@ export default function HomeScreen() {
 
         {cases.map((item) => (
           <Pressable
+            testID={`mobile-case-${item.id}`}
             style={styles.card}
             key={item.id}
             onPress={() => router.push({ pathname: '/case/[id]', params: { id: item.id } })}

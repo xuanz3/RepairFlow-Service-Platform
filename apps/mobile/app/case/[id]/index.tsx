@@ -85,6 +85,7 @@ export default function RepairCaseScreen() {
         {(['overview', 'diagnosis', 'repair', 'quality'] as Tab[]).map((item) => (
           <Pressable
             key={item}
+            testID={`mobile-tab-${item}`}
             style={[
               styles.secondaryButton,
               { flex: 1, minHeight: 38, paddingHorizontal: 5 },
@@ -114,6 +115,7 @@ export default function RepairCaseScreen() {
             </View>
           </View>
           <Pressable
+            testID="mobile-capture-evidence"
             style={styles.primaryButton}
             onPress={() =>
               router.push({
