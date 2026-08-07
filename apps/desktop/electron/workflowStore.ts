@@ -165,6 +165,12 @@ export class LocalWorkflowStore {
     return repairCase;
   }
 
+  public delete(id: string): boolean {
+    if (!id || id.length > 80) throw new TypeError('Repair workflow id is invalid.');
+    const result = this.database.prepare('DELETE FROM workflow_cases WHERE id = ?').run(id);
+    return Number(result.changes) > 0;
+  }
+
   public reset(): RepairCaseSummary[] {
     this.database.exec('DELETE FROM workflow_cases;');
     this.seed();
