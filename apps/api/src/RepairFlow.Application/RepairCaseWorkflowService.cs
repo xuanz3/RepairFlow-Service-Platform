@@ -6,19 +6,39 @@ public sealed class RepairCaseWorkflowService(
     IRepairCaseRepository repository,
     TimeProvider timeProvider)
 {
-    public async Task<RepairCaseDetailDto> CreateAsync(
+    public Task<RepairCaseDetailDto> CreateAsync(
         CreateRepairCaseRequest request,
+        CancellationToken cancellationToken) =>
+        CreateCoreAsync(request, null, cancellationToken);
+
+    public Task<RepairCaseDetailDto> CreateWithIdAsync(
+        Guid id,
+        CreateRepairCaseRequest request,
+        CancellationToken cancellationToken) =>
+        CreateCoreAsync(request, id, cancellationToken);
+
+    private async Task<RepairCaseDetailDto> CreateCoreAsync(
+        CreateRepairCaseRequest request,
+        Guid? requestedId,
         CancellationToken cancellationToken)
     {
         ValidateCreate(request);
         var now = timeProvider.GetUtcNow();
         var reference = await CreateReferenceAsync(now, cancellationToken);
-        var repairCase = RepairCase.Create(
-            reference,
-            request.CustomerDisplayName,
-            request.ReportedFault,
-            request.Priority,
-            now);
+        var repairCase = requestedId is { } id
+            ? RepairCase.CreateWithId(
+                id,
+                reference,
+                request.CustomerDisplayName,
+                request.ReportedFault,
+                request.Priority,
+                now)
+            : RepairCase.Create(
+                reference,
+                request.CustomerDisplayName,
+                request.ReportedFault,
+                request.Priority,
+                now);
 
         repairCase.AttachDevice(
             request.Manufacturer,
