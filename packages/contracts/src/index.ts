@@ -156,6 +156,93 @@ export interface HealthResponse {
   timestamp: string;
 }
 
+export const syncOperationKinds = [
+  'repair-case.create',
+  'diagnosis.record',
+  'repair-action.create',
+  'repair-action.complete',
+  'evidence.add',
+  'quality.submit',
+  'status.update',
+] as const;
+export type SyncOperationKind = (typeof syncOperationKinds)[number];
+
+export const syncReceiptStatuses = ['applied', 'replayed', 'conflict'] as const;
+export type SyncReceiptStatus = (typeof syncReceiptStatuses)[number];
+
+export interface SyncOperationEnvelope {
+  operationId: string;
+  kind: SyncOperationKind;
+  repairCaseId?: string;
+  baseVersion?: number;
+  payload: unknown;
+  createdAt: string;
+}
+
+export interface SyncFieldDifference {
+  field: string;
+  localValue?: string;
+  serverValue?: string;
+}
+
+export interface SyncConflict {
+  entityType: 'repair-case';
+  entityId: string;
+  baseVersion?: number;
+  serverVersion: number;
+  differences: SyncFieldDifference[];
+}
+
+export interface SyncOperationReceipt {
+  operationId: string;
+  status: SyncReceiptStatus;
+  serverVersion?: number;
+  repairCase?: RepairCaseDetail;
+  conflict?: SyncConflict;
+}
+
+export interface DeltaChange {
+  cursor: number;
+  entityType: 'repair-case';
+  entityId: string;
+  version: number;
+  deleted: boolean;
+  changedAt: string;
+  payload?: RepairCaseDetail;
+}
+
+export interface DeltaPage {
+  nextCursor: number;
+  hasMore: boolean;
+  snapshot: boolean;
+  changes: DeltaChange[];
+}
+
+export type UploadSessionState = 'active' | 'completed' | 'aborted';
+
+export interface BeginUploadRequest {
+  repairCaseId: string;
+  evidenceId: string;
+  fileName: string;
+  contentType: string;
+  totalBytes: number;
+  sha256: string;
+}
+
+export interface UploadSessionInfo {
+  sessionId: string;
+  repairCaseId: string;
+  evidenceId: string;
+  fileName: string;
+  contentType: string;
+  totalBytes: number;
+  receivedBytes: number;
+  sha256: string;
+  chunkSize: number;
+  state: UploadSessionState;
+  expiresAt: string;
+}
+
 const transitions: Readonly<Record<RepairCaseStatus, readonly RepairCaseStatus[]>> = {
   'checked-in': ['diagnosing', 'cancelled'],
   diagnosing: ['awaiting-approval', 'in-repair', 'cancelled'],
