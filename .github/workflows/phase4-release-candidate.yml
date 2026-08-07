@@ -92,9 +92,19 @@ jobs:
       - shell: bash
         run: |
           mkdir -p artifacts/desktop-${{ matrix.platform }}
-          if [ '${{ matrix.platform }}' = 'macos' ]; then cp "$(find apps/desktop/release/desktop -type f -name '*.zip' | head -n 1)" artifacts/desktop-macos/RepairFlow-macOS-arm64.zip; fi
-          if [ '${{ matrix.platform }}' = 'windows' ]; then cp "$(find apps/desktop/release/desktop -type f -name '*.exe' | head -n 1)" artifacts/desktop-windows/RepairFlow-Windows-x64.exe; fi
-          if [ '${{ matrix.platform }}' = 'linux' ]; then cp "$(find apps/desktop/release/desktop -type f -name '*.AppImage' | head -n 1)" artifacts/desktop-linux/RepairFlow-Linux-x64.AppImage; fi
+          pick_first() {
+            pattern="$1"
+            selected=""
+            while IFS= read -r candidate; do
+              selected="$candidate"
+              break
+            done < <(find apps/desktop/release/desktop -type f -name "$pattern" -print | sort)
+            test -n "$selected"
+            printf '%s\n' "$selected"
+          }
+          if [ '${{ matrix.platform }}' = 'macos' ]; then cp "$(pick_first '*.zip')" artifacts/desktop-macos/RepairFlow-macOS-arm64.zip; fi
+          if [ '${{ matrix.platform }}' = 'windows' ]; then cp "$(pick_first '*.exe')" artifacts/desktop-windows/RepairFlow-Windows-x64.exe; fi
+          if [ '${{ matrix.platform }}' = 'linux' ]; then cp "$(pick_first '*.AppImage')" artifacts/desktop-linux/RepairFlow-Linux-x64.AppImage; fi
       - uses: actions/upload-artifact@v4
         with:
           name: desktop-${{ matrix.platform }}
@@ -119,12 +129,7 @@ jobs:
         run: ./gradlew assembleRelease
       - run: mkdir -p artifacts/android && cp apps/mobile/android/app/build/outputs/apk/release/app-release.apk artifacts/android/RepairFlow-Android.apk
       - uses: actions/upload-artifact@v4
-        with:
-          {
-            name: mobile-android,
-            path: artifacts/android/RepairFlow-Android.apk,
-            if-no-files-found: error,
-          }
+        with: { name: mobile-android, path: artifacts/android/RepairFlow-Android.apk, if-no-files-found: error }
       - name: Run Android release smoke and capture offline queue
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -160,7 +165,11 @@ jobs:
         working-directory: apps/mobile
         run: |
           xcodebuild -workspace ios/RepairFlow.xcworkspace -scheme RepairFlow -configuration Release -sdk iphonesimulator -derivedDataPath build/ios CODE_SIGNING_ALLOWED=NO build
-          APP_REL="$(find build/ios/Build/Products -maxdepth 2 -type d -name 'RepairFlow.app' | head -n 1)"
+          APP_REL=""
+          while IFS= read -r candidate; do
+            APP_REL="$candidate"
+            break
+          done < <(find build/ios/Build/Products -maxdepth 2 -type d -name 'RepairFlow.app' -print | sort)
           test -n "$APP_REL"
           APP_PATH="$PWD/$APP_REL"
           ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" ../../RepairFlow-iOS-Simulator.zip
@@ -191,12 +200,7 @@ jobs:
           maestro test apps/mobile/maestro/release-smoke.yaml
           maestro test --test-output-dir artifacts/media/ios apps/mobile/maestro/release-media-ios.yaml
       - uses: actions/upload-artifact@v4
-        with:
-          {
-            name: mobile-ios-simulator,
-            path: artifacts/ios/RepairFlow-iOS-Simulator.zip,
-            if-no-files-found: error,
-          }
+        with: { name: mobile-ios-simulator, path: artifacts/ios/RepairFlow-iOS-Simulator.zip, if-no-files-found: error }
       - uses: actions/upload-artifact@v4
         with: { name: media-ios, path: artifacts/media/ios/**, if-no-files-found: error }
 
@@ -230,8 +234,7 @@ jobs:
           PUPPETEER_SKIP_DOWNLOAD=true npx -y @mermaid-js/mermaid-cli@11.16.0 -p tools/media/puppeteer-config.json -i tools/media/system-architecture.mmd -o artifacts/media/diagrams/15-system-architecture.png -w 1400 -H 700 -b '#ffffff'
           PUPPETEER_SKIP_DOWNLOAD=true npx -y @mermaid-js/mermaid-cli@11.16.0 -p tools/media/puppeteer-config.json -i tools/media/synchronisation-sequence.mmd -o artifacts/media/diagrams/16-synchronisation-sequence.png -w 1400 -H 700 -b '#ffffff'
       - uses: actions/upload-artifact@v4
-        with:
-          { name: media-diagrams, path: artifacts/media/diagrams/*.png, if-no-files-found: error }
+        with: { name: media-diagrams, path: artifacts/media/diagrams/*.png, if-no-files-found: error }
 
   aggregate-release:
     name: Aggregate Release Bundle and Product Media
@@ -268,16 +271,6 @@ jobs:
           test "$(find artifacts/media/final -type f -name '*.png' | wc -l | tr -d ' ')" = 18
           test "$(find artifacts/release-bundle -maxdepth 1 -type f | wc -l | tr -d ' ')" -ge 9
       - uses: actions/upload-artifact@v4
-        with:
-          {
-            name: phase4-product-media,
-            path: artifacts/media/final/*.png,
-            if-no-files-found: error,
-          }
+        with: { name: phase4-product-media, path: artifacts/media/final/*.png, if-no-files-found: error }
       - uses: actions/upload-artifact@v4
-        with:
-          {
-            name: repairflow-release-bundle,
-            path: artifacts/release-bundle/*,
-            if-no-files-found: error,
-          }
+        with: { name: repairflow-release-bundle, path: artifacts/release-bundle/*, if-no-files-found: error }

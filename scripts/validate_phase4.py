@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+from pathlib import Path
+import json, os, re
+root=Path(__file__).resolve().parents[1]
+required=['tools/release/prepare-desktop-package.mjs','tools/verify/desktop-package-contract.mjs','tools/release/verify-mobile-native-contract.py','tools/release/build-metadata.mjs','tools/release/generate-checksums.mjs','tools/release/generate-sbom.mjs','tools/release/finalise-readme.mjs','tools/verify/release-bundle-contract.mjs','tools/media/capture-manifest.json','tools/media/compose-final-media.mjs','tools/media/insert-readme-media.mjs','apps/desktop/playwright.a11y.config.ts','apps/desktop/tests/a11y/workshop.a11y.spec.ts','apps/desktop/tests/media/product-media.e2e.ts','apps/mobile/maestro/release-smoke.yaml','apps/mobile/maestro/release-media-android.yaml','apps/mobile/maestro/release-media-ios.yaml','.github/workflows/phase4-release-candidate.yml']
+missing=[x for x in required if not (root/x).is_file()]; assert not missing, f'Missing Phase 4 files: {missing}'
+for rel in ['package.json','apps/desktop/package.json','apps/mobile/package.json']:
+ data=json.loads((root/rel).read_text()); assert data['version']=='1.0.0', f'{rel} must be version 1.0.0'
+app=json.loads((root/'apps/mobile/app.json').read_text())['expo']; assert app['version']=='1.0.0'
+manifest=json.loads((root/'tools/media/capture-manifest.json').read_text()); names=[x['file'] for x in manifest['items']]
+assert len(names)==18 and len(set(names))==18 and sum(bool(x['primary']) for x in manifest['items'])==6
+final=root/'docs/evidence/final'; images=sorted(p.name for p in final.glob('*.png')) if final.exists() else []
+strict=os.getenv('REPAIRFLOW_REQUIRE_FINAL_MEDIA')=='1'
+assert len(images) in ({18} if strict else {0,18}), f'Expected {"exactly 18" if strict else "zero or 18"} final images, found {len(images)}'
+if images:
+ assert images==sorted(names), 'Final media names differ from approved manifest'
+ readme=(root/'README.md').read_text()
+ for name in names: assert readme.count(f'docs/evidence/final/{name}')==1, f'README reference missing or duplicated: {name}'
+ assert 'Product media will be inserted' not in readme
+ if strict:
+  assert '> Current version: **v1.0.0**' in readme
+  assert re.search(r'^\| Phase 4 \|.*\| Complete \|$', readme, flags=re.MULTILINE), 'README Phase 4 status must be Complete'
+  from struct import unpack
+  for name in names:
+   data=(final/name).read_bytes(); assert data[:8]==b'\x89PNG\r\n\x1a\n', f'{name} is not PNG'; width,height=unpack('>II',data[16:24]); assert (width,height)==(1600,900), f'{name} dimensions are {width}x{height}'
+readme=(root/'README.md').read_text(); assert re.search(r'^\| Phase 3 \| Offline synchronisation, reliability, security and observability \| Complete\s*\|$', readme, flags=re.MULTILINE), 'README must retain Phase 3 as Complete'
+workspace_policy=(root/'pnpm-workspace.yaml').read_text()
+for token in ['  electron-winstaller: true', '  sharp: true']:
+ assert token in workspace_policy, f'pnpm lifecycle allowlist missing reviewed entry: {token.strip()}'
+workflow=(root/'.github/workflows/phase4-release-candidate.yml').read_text()
+assert 'head -n 1' not in workflow, 'Phase 4 workflow must not use early-exit head pipelines under GitHub Actions pipefail'
+for token in ['desktop-package','android-package','ios-package','desktop-media','aggregate-release']:
+ assert token in workflow, f'Phase 4 workflow missing {token}'
+print('Phase 4 release and media validation passed.')
