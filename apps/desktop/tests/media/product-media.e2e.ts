@@ -6,8 +6,7 @@ const out = resolve(process.env.REPAIRFLOW_MEDIA_OUTPUT ?? '../../artifacts/medi
 test('captures deterministic desktop product states from Electron', async () => {
   await mkdir(out, { recursive: true });
   const app = await electron.launch({
-    args:
-      process.platform === 'linux' && process.env.CI ? ['--no-sandbox', '.'] : ['.'],
+    args: process.platform === 'linux' && process.env.CI ? ['--no-sandbox', '.'] : ['.'],
     cwd: resolve('.'),
     env: { ...process.env, REPAIRFLOW_CAPTURE_MODE: '1' },
   });
