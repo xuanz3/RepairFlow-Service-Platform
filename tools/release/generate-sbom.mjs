@@ -19,7 +19,7 @@ for (const line of lock.split(/\r?\n/)) {
   }
   if (inSnapshots && /^[A-Za-z]/.test(line)) break;
   if (!inSnapshots) continue;
-  const m = line.match(/^  ['"]?(.+?)['"]?:\s*$/);
+  const m = line.match(/^ {2}['"]?(.+?)['"]?:\s*$/);
   if (!m) continue;
   let raw = m[1];
   const paren = raw.indexOf('(');

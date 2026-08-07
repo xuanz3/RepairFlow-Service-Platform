@@ -53,4 +53,8 @@ tracked=set(subprocess.check_output(['git','ls-files'], cwd=root, text=True).spl
 for rel in release_helpers:
  assert rel in tracked, f'Phase 4 release helper must be tracked by Git: {rel}'
 
+sbom_source=(root/'tools/release/generate-sbom.mjs').read_text()
+assert "/^ {2}['\"]?" in sbom_source, 'SBOM lockfile parser must use an explicit {2} indentation quantifier'
+assert "/^  ['\"]?" not in sbom_source, 'SBOM lockfile parser must not use hard-to-count repeated regex spaces'
+
 print('Phase 4 release and media validation passed.')
