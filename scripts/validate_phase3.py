@@ -70,6 +70,23 @@ for entity, key in {
     expected = f'entity.Property(item => item.{key}).ValueGeneratedNever();'
     assert expected in block, f'{entity}.{key} must be configured as application-generated'
 
+# Desktop shell jobs run from clean checkouts. Phase 3 makes the desktop package
+# depend on the built sync-engine workspace package, so both inherited workflows
+# must materialise sync-engine declarations before invoking raw desktop typecheck.
+platform_workflow = (ROOT / '.github/workflows/platform-foundation.yml').read_text()
+repair_workflow = (ROOT / '.github/workflows/repair-workflows.yml').read_text()
+sync_engine_build = 'pnpm --filter @repairflow/sync-engine build'
+desktop_typecheck = 'pnpm --filter @repairflow/desktop typecheck'
+for workflow_name, workflow_text in (
+    ('Platform Foundation', platform_workflow),
+    ('Repair Workflows', repair_workflow),
+):
+    sync_position = workflow_text.find(sync_engine_build)
+    desktop_position = workflow_text.find(desktop_typecheck)
+    assert sync_position >= 0, f'{workflow_name} must build sync-engine in clean desktop jobs'
+    assert desktop_position >= 0, f'{workflow_name} desktop typecheck command is missing'
+    assert sync_position < desktop_position, f'{workflow_name} must build sync-engine before desktop typecheck'
+
 readme = (ROOT / 'README.md').read_text()
 assert 'Current stage: **Phase 3 - Synchronisation Reliability and Operations**' in readme
 assert '| Phase 3 | Offline synchronisation, reliability, security and observability | Complete |' in readme
