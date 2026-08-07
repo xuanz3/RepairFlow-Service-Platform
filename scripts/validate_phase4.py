@@ -39,12 +39,17 @@ for forbidden in ["tests/a11y", "tests/e2e", "tests/media"]:
 
 vite_config=(root/'apps/desktop/vite.config.ts').read_text()
 assert "base: './'" in vite_config, 'Desktop Vite production build must use relative asset URLs for Electron file loading'
+app_source=(root/'apps/desktop/src/App.tsx').read_text()
+for token in ['const resetCases = await workflowRepository.reset();', 'setCases(resetCases);', 'if (nextId) await loadCase(nextId);']:
+ assert token in app_source, f'Desktop preview reset must restore a concrete selected case: {token}'
 media_test=(root/'apps/desktop/tests/media/product-media.e2e.ts').read_text()
+for token in ["toContainText('Sample Customer'", "toContainText('Orion Devices'"]:
+ assert token in media_test, f'Desktop media capture must wait for deterministic reset selection: {token}'
 for token in ["getByTestId('new-intake')", "process.platform === 'linux' && process.env.CI", "['--no-sandbox', '.']"]:
  assert token in media_test, f'Desktop Electron media capture missing production readiness token: {token}'
 package_contract=(root/'tools/verify/desktop-package-contract.mjs').read_text()
 assert 'Production Electron renderer must use relative Vite asset URLs.' in package_contract, 'Desktop package contract must verify file-safe renderer assets'
-assert '=\\"\/assets' not in package_contract, 'Desktop package contract regex must not contain a useless escaped quote'
+assert r'=\"\/assets' not in package_contract, 'Desktop package contract regex must not contain a useless escaped quote'
 
 media_config=(root/'apps/desktop/playwright.media.config.ts').read_text()
 assert "testDir: './tests/media'" in media_config, 'Desktop media Playwright config must target tests/media'

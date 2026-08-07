@@ -108,12 +108,14 @@ export function App() {
   }
 
   async function resetPreview(): Promise<void> {
-    await workflowRepository.reset();
+    const resetCases = await workflowRepository.reset();
+    setCases(resetCases);
+    const nextId = resetCases[0]?.id;
     setSelected(undefined);
-    setSelectedId(undefined);
+    setSelectedId(nextId);
     setActiveTab('overview');
     setMessage('Preview data reset.');
-    await loadQueue();
+    if (nextId) await loadCase(nextId);
   }
 
   return (

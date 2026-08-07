@@ -16,6 +16,7 @@ test('captures deterministic desktop product states from Electron', async () => 
   await expect(page.getByTestId('new-intake')).toBeVisible({ timeout: 15000 });
   await expect(page.getByRole('heading', { name: 'Repair operations' })).toBeVisible();
   await page.getByRole('button', { name: 'Reset preview' }).click();
+  await expect(page.getByTestId('case-workspace')).toContainText('Sample Customer', { timeout: 15000 });
   await page.screenshot({
     path: resolve(out, '02-desktop-workshop-dashboard.png'),
     fullPage: true,
@@ -24,6 +25,7 @@ test('captures deterministic desktop product states from Electron', async () => 
   await page.screenshot({ path: resolve(out, '03-desktop-case-explorer.png'), fullPage: true });
   await page.getByPlaceholder('Search reference, customer or device').fill('');
   await page.locator('.case-row').filter({ hasText: 'Orion Devices' }).first().click();
+  await expect(page.getByTestId('case-workspace')).toContainText('Orion Devices', { timeout: 15000 });
   await page.getByRole('tab', { name: 'Overview' }).click();
   await page.screenshot({ path: resolve(out, '04-desktop-case-inspector.png'), fullPage: true });
   await page.getByRole('tab', { name: 'Evidence' }).click();
