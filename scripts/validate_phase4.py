@@ -51,6 +51,9 @@ assert "testMatch: '**/*.e2e.ts'" in media_config, 'Desktop media Playwright con
 
 workflow=(root/'.github/workflows/phase4-release-candidate.yml').read_text()
 assert 'head -n 1' not in workflow, 'Phase 4 workflow must not use early-exit head pipelines under GitHub Actions pipefail'
+assert workflow.count('electron --no-sandbox .release-package') == 2, 'Linux CI runtime smoke must use --no-sandbox exactly twice'
+assert 'ELECTRON_DISABLE_SANDBOX' not in workflow, 'Phase 4 workflow must not disable Electron sandbox globally'
+
 for token in ['desktop-package','android-package','ios-package','desktop-media','aggregate-release']:
  assert token in workflow, f'Phase 4 workflow missing {token}'
 release_helpers=['tools/release/prepare-desktop-package.mjs','tools/release/verify-mobile-native-contract.py','tools/release/build-metadata.mjs','tools/release/generate-checksums.mjs','tools/release/generate-sbom.mjs','tools/release/finalise-readme.mjs']

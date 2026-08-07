@@ -77,8 +77,8 @@ jobs:
           REPAIRFLOW_RUNTIME_SMOKE: '1'
           REPAIRFLOW_RUNTIME_SMOKE_PATH: ${{ runner.temp }}/repairflow-desktop-upgrade.sqlite
         run: |
-          xvfb-run -a pnpm --filter @repairflow/desktop exec electron .release-package
-          xvfb-run -a pnpm --filter @repairflow/desktop exec electron .release-package
+          xvfb-run -a pnpm --filter @repairflow/desktop exec electron --no-sandbox .release-package
+          xvfb-run -a pnpm --filter @repairflow/desktop exec electron --no-sandbox .release-package
       - if: matrix.platform != 'linux'
         env:
           REPAIRFLOW_RUNTIME_SMOKE: '1'
