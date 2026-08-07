@@ -49,6 +49,12 @@ export async function saveLocalRepairCase(repairCase: RepairCaseDetail): Promise
   return repairCase;
 }
 
+export async function deleteLocalRepairCase(id: string): Promise<boolean> {
+  const database = await getDatabase();
+  const result = await database.runAsync('DELETE FROM workflow_cases WHERE id = ?', id);
+  return result.changes > 0;
+}
+
 export async function resetLocalRepairCases(): Promise<void> {
   const database = await getDatabase();
   await database.execAsync('DELETE FROM workflow_cases;');
