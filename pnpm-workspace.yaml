@@ -7,11 +7,13 @@ packages:
 # Keep the allowlist intentionally narrow and review every addition.
 allowBuilds:
   electron: true
+  electron-winstaller: true
   esbuild: true
   sharp: true
 
 # Retained for contributors using pnpm 10; pnpm 11 uses allowBuilds above.
 onlyBuiltDependencies:
   - electron
+  - electron-winstaller
   - esbuild
   - sharp
