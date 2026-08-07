@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "width": 1600,
+  "height": 900,
+  "items": [
+    {
+      "file": "01-cross-platform-hero.png",
+      "title": "Cross-platform repair operations",
+      "source": "composite",
+      "primary": true
+    },
+    {
+      "file": "02-desktop-workshop-dashboard.png",
+      "title": "Desktop workshop dashboard",
+      "source": "desktop",
+      "primary": true
+    },
+    {
+      "file": "03-desktop-case-explorer.png",
+      "title": "Desktop case explorer",
+      "source": "desktop",
+      "primary": false
+    },
+    {
+      "file": "04-desktop-case-inspector.png",
+      "title": "Desktop case inspector",
+      "source": "desktop",
+      "primary": true
+    },
+    {
+      "file": "05-desktop-evidence-comparison.png",
+      "title": "Desktop evidence review",
+      "source": "desktop",
+      "primary": false
+    },
+    {
+      "file": "06-desktop-quality-review.png",
+      "title": "Desktop quality review",
+      "source": "desktop",
+      "primary": false
+    },
+    {
+      "file": "07-desktop-conflict-centre.png",
+      "title": "Desktop synchronisation conflict centre",
+      "source": "desktop",
+      "primary": false
+    },
+    {
+      "file": "08-mobile-work-queue.png",
+      "title": "Mobile work queue",
+      "source": "ios",
+      "primary": true
+    },
+    {
+      "file": "09-mobile-device-check-in.png",
+      "title": "Mobile device check-in",
+      "source": "ios",
+      "primary": false
+    },
+    {
+      "file": "10-mobile-qr-lookup.png",
+      "title": "Mobile QR and serial lookup",
+      "source": "ios",
+      "primary": false
+    },
+    {
+      "file": "11-mobile-condition-capture.png",
+      "title": "Mobile intake condition capture",
+      "source": "ios",
+      "primary": false
+    },
+    {
+      "file": "12-mobile-annotation.png",
+      "title": "Mobile evidence annotation",
+      "source": "ios",
+      "primary": false
+    },
+    {
+      "file": "13-mobile-diagnosis.png",
+      "title": "Mobile diagnosis workflow",
+      "source": "ios",
+      "primary": true
+    },
+    {
+      "file": "14-mobile-offline-queue.png",
+      "title": "Mobile offline queue",
+      "source": "android",
+      "primary": false
+    },
+    {
+      "file": "15-system-architecture.png",
+      "title": "System architecture",
+      "source": "mermaid",
+      "primary": true
+    },
+    {
+      "file": "16-synchronisation-sequence.png",
+      "title": "Synchronisation sequence",
+      "source": "mermaid",
+      "primary": false
+    },
+    {
+      "file": "17-test-observability-summary.png",
+      "title": "Verification and observability",
+      "source": "generated",
+      "primary": false
+    },
+    {
+      "file": "18-release-artifact-matrix.png",
+      "title": "Release artifact matrix",
+      "source": "generated",
+      "primary": false
+    }
+  ]
+}
