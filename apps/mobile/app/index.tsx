@@ -105,7 +105,10 @@ export default function HomeScreen() {
                 <Text style={styles.cardTitle}>
                   {item.device.manufacturer} {item.device.model}
                 </Text>
-                <Text style={styles.cardCopy}>
+                <Text
+                  testID={customerQueueTestId(item.customerDisplayName)}
+                  style={styles.cardCopy}
+                >
                   {item.reference} · {item.customerDisplayName}
                 </Text>
               </View>
@@ -133,4 +136,13 @@ export default function HomeScreen() {
       </ScrollView>
     </SafeAreaView>
   );
+}
+
+function customerQueueTestId(customerDisplayName: string): string {
+  const segment = customerDisplayName
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return `mobile-case-customer-${segment || 'unknown'}`;
 }

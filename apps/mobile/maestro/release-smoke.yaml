@@ -44,9 +44,11 @@ appId: com.xuanz3.repairflow.mobile
       id: 'mobile-home'
     timeout: 30000
 - scrollUntilVisible:
-    element: 'Release Verification'
+    element:
+      id: 'mobile-case-customer-release-verification'
     direction: DOWN
-- assertVisible: 'Release Verification'
+- assertVisible:
+    id: 'mobile-case-customer-release-verification'
 - stopApp
 - launchApp
 - extendedWaitUntil:
@@ -54,6 +56,8 @@ appId: com.xuanz3.repairflow.mobile
       id: 'mobile-home'
     timeout: 90000
 - scrollUntilVisible:
-    element: 'Release Verification'
+    element:
+      id: 'mobile-case-customer-release-verification'
     direction: DOWN
-- assertVisible: 'Release Verification'
+- assertVisible:
+    id: 'mobile-case-customer-release-verification'

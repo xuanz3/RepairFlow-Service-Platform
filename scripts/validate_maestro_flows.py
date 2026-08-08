@@ -34,6 +34,7 @@ suite_contracts: dict[str, set[str]] = {
         "mobile-home",
         "mobile-new-intake",
         "mobile-route-back",
+        "mobile-case-customer-release-verification",
         "save-intake",
         "stopApp",
         "Release Verification",
@@ -81,6 +82,7 @@ for flow in flows.values():
 app_selector_contracts = {
     ROOT / "apps" / "mobile" / "app" / "_layout.tsx": {"mobile-route-back"},
     ROOT / "apps" / "mobile" / "app" / "index.tsx": {
+        "mobile-case-customer-",
         "mobile-home",
         "mobile-local-queue-protected",
     },
@@ -95,6 +97,26 @@ for source, required_tokens in app_selector_contracts.items():
         errors.append(
             f"{source.relative_to(ROOT)} is missing Maestro selector tokens: {', '.join(missing)}"
         )
+
+workflow = (ROOT / ".github" / "workflows" / "phase4-release-candidate.yml").read_text(
+    encoding="utf-8"
+)
+for token in [
+    "-gpu software",
+    "MAESTRO_DIAGNOSTIC_DIR: artifacts/diagnostics/android",
+    "MAESTRO_DIAGNOSTIC_DIR: artifacts/diagnostics/ios",
+    "diagnostics-android",
+    "diagnostics-ios",
+]:
+    if token not in workflow:
+        errors.append(f"Phase 4 workflow is missing native verification token: {token}")
+if "-gpu swiftshader_indirect" in workflow:
+    errors.append("Phase 4 workflow must not use the deprecated swiftshader_indirect renderer.")
+
+retry_helper = (ROOT / "scripts" / "run-maestro-with-retry.sh").read_text(encoding="utf-8")
+for token in ["capture_diagnostics", "android-logcat.txt", "android-ui.xml", "ios-screen.png"]:
+    if token not in retry_helper:
+        errors.append(f"Maestro retry helper is missing diagnostic token: {token}")
 
 expected_mobile_captures = {
     "08-mobile-work-queue",

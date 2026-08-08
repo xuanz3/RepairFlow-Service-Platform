@@ -17,6 +17,36 @@ esac
 export MAESTRO_DRIVER_STARTUP_TIMEOUT="${MAESTRO_DRIVER_STARTUP_TIMEOUT:-180000}"
 export MAESTRO_CLI_NO_ANALYTICS="${MAESTRO_CLI_NO_ANALYTICS:-1}"
 
+capture_diagnostics() {
+  repairflow_diagnostic_dir="${MAESTRO_DIAGNOSTIC_DIR:-}"
+  [ -n "$repairflow_diagnostic_dir" ] || return 0
+  mkdir -p "$repairflow_diagnostic_dir"
+
+  repairflow_latest_maestro=""
+  if [ -d "$HOME/.maestro/tests" ]; then
+    while IFS= read -r repairflow_candidate; do
+      repairflow_latest_maestro="$repairflow_candidate"
+    done < <(find "$HOME/.maestro/tests" -mindepth 1 -maxdepth 1 -type d -print | LC_ALL=C sort)
+  fi
+  if [ -n "$repairflow_latest_maestro" ]; then
+    cp -R "$repairflow_latest_maestro" "$repairflow_diagnostic_dir/maestro-latest" || true
+  fi
+
+  if command -v adb >/dev/null 2>&1 && adb get-state >/dev/null 2>&1; then
+    adb logcat -d -v threadtime > "$repairflow_diagnostic_dir/android-logcat.txt" 2>&1 || true
+    adb shell dumpsys activity activities > "$repairflow_diagnostic_dir/android-activity.txt" 2>&1 || true
+    adb shell dumpsys window windows > "$repairflow_diagnostic_dir/android-window.txt" 2>&1 || true
+    adb shell uiautomator dump /sdcard/repairflow-ui.xml >/dev/null 2>&1 || true
+    adb pull /sdcard/repairflow-ui.xml "$repairflow_diagnostic_dir/android-ui.xml" >/dev/null 2>&1 || true
+    adb exec-out screencap -p > "$repairflow_diagnostic_dir/android-screen.png" 2>/dev/null || true
+  fi
+
+  if command -v xcrun >/dev/null 2>&1 && [ -n "${MAESTRO_IOS_UDID:-}" ]; then
+    xcrun simctl io "$MAESTRO_IOS_UDID" screenshot \
+      "$repairflow_diagnostic_dir/ios-screen.png" >/dev/null 2>&1 || true
+  fi
+}
+
 repairflow_attempt=1
 while [ "$repairflow_attempt" -le "$repairflow_max_attempts" ]; do
   echo "Maestro attempt ${repairflow_attempt}/${repairflow_max_attempts}: $*"
@@ -27,6 +57,7 @@ while [ "$repairflow_attempt" -le "$repairflow_max_attempts" ]; do
   fi
 
   if [ "$repairflow_attempt" -eq "$repairflow_max_attempts" ]; then
+    capture_diagnostics
     echo "Maestro failed after ${repairflow_max_attempts} attempts." >&2
     exit "$repairflow_status"
   fi
