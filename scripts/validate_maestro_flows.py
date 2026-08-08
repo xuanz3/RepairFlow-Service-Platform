@@ -102,6 +102,9 @@ workflow = (ROOT / ".github" / "workflows" / "phase4-release-candidate.yml").rea
     encoding="utf-8"
 )
 for token in [
+    "Prepare Android emulator acceleration",
+    "sudo chmod 0666 /dev/kvm || true",
+    "disable-linux-hw-accel: auto",
     "-gpu software",
     "MAESTRO_DIAGNOSTIC_DIR: artifacts/diagnostics/android",
     "MAESTRO_DIAGNOSTIC_DIR: artifacts/diagnostics/ios",
@@ -110,6 +113,14 @@ for token in [
 ]:
     if token not in workflow:
         errors.append(f"Phase 4 workflow is missing native verification token: {token}")
+for forbidden in [
+    "sudo udevadm control --reload-rules",
+    "sudo udevadm trigger --name-match=kvm",
+    "test -r /dev/kvm",
+    "test -w /dev/kvm",
+]:
+    if forbidden in workflow:
+        errors.append(f"Phase 4 workflow still contains a fatal KVM preflight command: {forbidden}")
 if "-gpu swiftshader_indirect" in workflow:
     errors.append("Phase 4 workflow must not use the deprecated swiftshader_indirect renderer.")
 

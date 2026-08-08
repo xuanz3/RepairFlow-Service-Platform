@@ -122,13 +122,18 @@ jobs:
         with: { node-version: 22.23.1, cache: pnpm }
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: '17' }
-      - name: Enable KVM acceleration
+      - name: Prepare Android emulator acceleration
         run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-          test -r /dev/kvm
-          test -w /dev/kvm
+          if [ -e /dev/kvm ]; then
+            sudo chmod 0666 /dev/kvm || true
+            if [ -r /dev/kvm ] && [ -w /dev/kvm ]; then
+              echo "KVM acceleration is available."
+            else
+              echo "::warning::KVM exists but is not accessible; the emulator runner will choose its safe fallback."
+            fi
+          else
+            echo "::warning::/dev/kvm is unavailable on this runner; the emulator runner will choose its safe fallback."
+          fi
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec turbo run build --filter=@repairflow/mobile
       - run: pnpm --dir apps/mobile native:android
@@ -153,6 +158,7 @@ jobs:
           arch: x86_64
           profile: pixel_6
           emulator-boot-timeout: 1200
+          disable-linux-hw-accel: auto
           emulator-options: -no-window -gpu software -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none
           script: |
             adb install -r artifacts/android/RepairFlow-Android.apk
