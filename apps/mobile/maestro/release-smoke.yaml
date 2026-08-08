@@ -25,6 +25,11 @@ appId: com.xuanz3.repairflow.mobile
 - tapOn:
     id: 'intake-condition'
 - inputText: 'No impact damage observed at intake.'
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: 'save-intake'
+    direction: DOWN
 - tapOn:
     id: 'save-intake'
 - assertVisible: 'Release Verification'

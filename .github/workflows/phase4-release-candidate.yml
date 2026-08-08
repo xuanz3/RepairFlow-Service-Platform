@@ -145,10 +145,10 @@ jobs:
             adb install -r artifacts/android/RepairFlow-Android.apk
             curl -fLsS -o /tmp/install-maestro.sh https://get.maestro.mobile.dev
             bash /tmp/install-maestro.sh
-            export PATH="$HOME/.maestro/bin:$PATH"
+            test -x "$HOME/.maestro/bin/maestro"
             mkdir -p artifacts/media/android
-            maestro test apps/mobile/maestro/release-smoke.yaml
-            maestro test --test-output-dir artifacts/media/android apps/mobile/maestro/release-media-android.yaml
+            "$HOME/.maestro/bin/maestro" test apps/mobile/maestro/release-smoke.yaml
+            "$HOME/.maestro/bin/maestro" test --test-output-dir artifacts/media/android apps/mobile/maestro/release-media-android.yaml
       - uses: actions/upload-artifact@v4
         with: { name: media-android, path: artifacts/media/android/**, if-no-files-found: error }
 
@@ -200,10 +200,10 @@ jobs:
           xcrun simctl privacy "$DEVICE" grant camera com.xuanz3.repairflow.mobile || true
           curl -fLsS -o /tmp/install-maestro.sh https://get.maestro.mobile.dev
           bash /tmp/install-maestro.sh
-          export PATH="$HOME/.maestro/bin:$PATH"
+          test -x "$HOME/.maestro/bin/maestro"
           mkdir -p artifacts/media/ios
-          maestro test apps/mobile/maestro/release-smoke.yaml
-          maestro test --test-output-dir artifacts/media/ios apps/mobile/maestro/release-media-ios.yaml
+          "$HOME/.maestro/bin/maestro" test apps/mobile/maestro/release-smoke.yaml
+          "$HOME/.maestro/bin/maestro" test --test-output-dir artifacts/media/ios apps/mobile/maestro/release-media-ios.yaml
       - uses: actions/upload-artifact@v4
         with:
           {
