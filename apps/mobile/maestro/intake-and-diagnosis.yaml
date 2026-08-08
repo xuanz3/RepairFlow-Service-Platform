@@ -2,7 +2,10 @@ appId: com.xuanz3.repairflow.mobile
 ---
 - launchApp:
     clearState: true
-- assertVisible: 'Workshop intake'
+- extendedWaitUntil:
+    visible:
+      id: 'mobile-home'
+    timeout: 90000
 - tapOn:
     id: 'mobile-new-intake'
 - tapOn:

@@ -34,7 +34,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.screen}>
+    <SafeAreaView testID="mobile-home" style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.rowBetween}>
           <View style={[styles.header, { flex: 1 }]}>
@@ -121,7 +121,10 @@ export default function HomeScreen() {
           </View>
         )}
 
-        <View style={[styles.card, { backgroundColor: '#16241f' }]}>
+        <View
+          testID="mobile-local-queue-protected"
+          style={[styles.card, { backgroundColor: '#16241f' }]}
+        >
           <Text style={[styles.cardTitle, styles.success]}>Local queue protected</Text>
           <Text style={styles.cardCopy}>
             SQLite uses WAL mode. Evidence files are copied into application storage and hashed.

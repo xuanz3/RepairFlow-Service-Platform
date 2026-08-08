@@ -25,21 +25,28 @@ for flow in flows.values():
 
 suite_contracts: dict[str, set[str]] = {
     "intake-and-diagnosis.yaml": {
+        "mobile-home",
         "mobile-new-intake",
         "save-intake",
         "mobile-save-diagnosis",
     },
     "release-smoke.yaml": {
+        "mobile-home",
         "mobile-new-intake",
+        "mobile-route-back",
         "save-intake",
         "stopApp",
         "Release Verification",
     },
     "release-media-android.yaml": {
+        "mobile-home",
+        "mobile-local-queue-protected",
         "setAirplaneMode",
         "14-mobile-offline-queue",
     },
     "release-media-ios.yaml": {
+        "mobile-home",
+        "mobile-route-back",
         "mobile-new-intake",
         "mobile-scan-qr",
         "mobile-capture-evidence",
@@ -63,6 +70,30 @@ for name, required_tokens in suite_contracts.items():
     if missing:
         errors.append(
             f"{flow.relative_to(ROOT)} is missing suite contract tokens: {', '.join(missing)}"
+        )
+
+for flow in flows.values():
+    if re.search(r"(?m)^- back\s*$", flow.read_text(encoding="utf-8")):
+        errors.append(
+            f"{flow.relative_to(ROOT)} uses Maestro back, which is not supported by the iOS release lane."
+        )
+
+app_selector_contracts = {
+    ROOT / "apps" / "mobile" / "app" / "_layout.tsx": {"mobile-route-back"},
+    ROOT / "apps" / "mobile" / "app" / "index.tsx": {
+        "mobile-home",
+        "mobile-local-queue-protected",
+    },
+}
+for source, required_tokens in app_selector_contracts.items():
+    if not source.is_file():
+        errors.append(f"Mobile selector source is missing: {source.relative_to(ROOT)}")
+        continue
+    text = source.read_text(encoding="utf-8")
+    missing = sorted(token for token in required_tokens if token not in text)
+    if missing:
+        errors.append(
+            f"{source.relative_to(ROOT)} is missing Maestro selector tokens: {', '.join(missing)}"
         )
 
 expected_mobile_captures = {

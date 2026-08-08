@@ -2,8 +2,10 @@ appId: com.xuanz3.repairflow.mobile
 ---
 - launchApp:
     clearState: true
-- assertVisible: 'Workshop intake'
-- assertVisible: 'Local queue protected'
+- extendedWaitUntil:
+    visible:
+      id: 'mobile-home'
+    timeout: 90000
 - tapOn:
     id: 'mobile-new-intake'
 - assertVisible: 'New repair intake'
@@ -32,16 +34,25 @@ appId: com.xuanz3.repairflow.mobile
     direction: DOWN
 - tapOn:
     id: 'save-intake'
-- assertVisible: 'Release Verification'
-- back
-- assertVisible: 'Workshop intake'
+- extendedWaitUntil:
+    visible: 'Release Verification'
+    timeout: 30000
+- tapOn:
+    id: 'mobile-route-back'
+- extendedWaitUntil:
+    visible:
+      id: 'mobile-home'
+    timeout: 30000
 - scrollUntilVisible:
     element: 'Release Verification'
     direction: DOWN
 - assertVisible: 'Release Verification'
 - stopApp
 - launchApp
-- assertVisible: 'Workshop intake'
+- extendedWaitUntil:
+    visible:
+      id: 'mobile-home'
+    timeout: 90000
 - scrollUntilVisible:
     element: 'Release Verification'
     direction: DOWN
