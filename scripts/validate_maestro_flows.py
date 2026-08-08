@@ -101,18 +101,21 @@ for source, required_tokens in app_selector_contracts.items():
 workflow = (ROOT / ".github" / "workflows" / "phase4-release-candidate.yml").read_text(
     encoding="utf-8"
 )
-for token in [
+# Phase 4 deliberately uses package-only mobile release lanes.
+# Emulator/simulator-driven Maestro capture must not be reintroduced into the release gate.
+for forbidden in [
+    "reactivecircus/android-emulator-runner@v2",
     "Prepare Android emulator acceleration",
-    "sudo chmod 0666 /dev/kvm || true",
-    "disable-linux-hw-accel: auto",
-    "-gpu software",
     "MAESTRO_DIAGNOSTIC_DIR: artifacts/diagnostics/android",
     "MAESTRO_DIAGNOSTIC_DIR: artifacts/diagnostics/ios",
-    "diagnostics-android",
-    "diagnostics-ios",
+    "release-media-android.yaml",
+    "release-media-ios.yaml",
+    "Install and capture iOS release",
 ]:
-    if token not in workflow:
-        errors.append(f"Phase 4 workflow is missing native verification token: {token}")
+    if forbidden in workflow:
+        errors.append(
+            f"Phase 4 package-only workflow must not contain automated media runtime: {forbidden}"
+        )
 for forbidden in [
     "sudo udevadm control --reload-rules",
     "sudo udevadm trigger --name-match=kvm",
