@@ -1,7 +1,13 @@
 # Product Media Plan
 
-Automated product-media capture is not part of the RepairFlow v1 release gate. Native package generation, runtime checks, accessibility checks, service tests, checksums and SBOM generation remain mandatory.
+RepairFlow v1 uses a manually curated product walkthrough for repository documentation. The published set contains ten screenshots under `docs/images/product/` and is capped at fifteen images so the repository home page remains focused.
 
-The existing Playwright, Maestro, Mermaid and Sharp media tooling is retained as optional source tooling for future manual or non-blocking media generation. It must not prevent Android, iOS Simulator, macOS, Windows or Linux release packages from being produced.
+The current walkthrough covers:
 
-The repository keeps a maximum of 18 final evidence images when media is generated intentionally. No final image set is required for v1.0.0.
+- desktop workshop overview and device intake;
+- diagnosis, repair actions, evidence, quality review and synchronisation;
+- mobile workshop intake, mobile device check-in and device-label scanning.
+
+Product media is documentation rather than a blocking release check. Native package generation, runtime checks that are supported by CI, accessibility checks, service tests, checksums and SBOM generation remain mandatory.
+
+The existing Playwright, Maestro, Mermaid and Sharp media tooling is retained as optional source tooling. Its legacy capture manifest remains separate from the curated README image set and must not prevent Android, iOS Simulator, macOS, Windows or Linux packages from being produced.
