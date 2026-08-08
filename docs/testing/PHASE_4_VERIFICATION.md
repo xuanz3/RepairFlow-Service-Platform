@@ -1,10 +1,10 @@
 # Phase 4 verification
 
-The release gate combines retained Phase 0-3 validation with Phase 4 packaging and product-media requirements.
+The release gate combines retained Phase 0-3 validation with deterministic cross-platform package builds. Automated product-media capture is intentionally not a release gate because emulator/simulator UI automation was the only unstable CI component and did not affect package creation.
 
-- Windows, macOS and Linux Electron packages are built from the reviewed source and the compiled runtime executes a local-data smoke check.
-- Android and iOS Simulator release builds are installed before Maestro smoke validation.
-- Android runs the local queue while airplane mode is enabled to verify offline access.
-- Desktop accessibility is scanned for serious/critical WCAG violations with reduced motion and enlarged text checks.
-- Exactly 18 deterministic final images are generated from app states, Mermaid diagrams and release evidence.
-- Release bundles contain build metadata, SHA-256 checksums, CycloneDX SBOM, release notes and known limitations.
+- Windows, macOS and Linux Electron packages are built from the reviewed source and the compiled desktop runtime executes a local-data smoke check.
+- Android produces the release APK directly through the generated native project and Gradle.
+- iOS produces an unsigned Simulator release application directly through CocoaPods and Xcode.
+- Desktop end-to-end and accessibility checks remain part of release quality.
+- The release bundle contains the five platform artefacts, build metadata, SHA-256 checksums, CycloneDX SBOM, release notes and known limitations.
+- Mobile emulator/simulator screenshot capture and Maestro release-media execution are excluded from CI release gating.

@@ -2,7 +2,7 @@
 
 RepairFlow is an offline-first repair operations platform for electronics service teams. It connects mobile device intake and evidence capture with a desktop workshop workspace and an ASP.NET Core service.
 
-> Current stage: **Phase 4 - Packaging, Product Media and v1.0**
+> Current version: **v1.0.0**
 
 ## Core workflow
 
@@ -10,7 +10,7 @@ RepairFlow is an offline-first repair operations platform for electronics servic
 
 <!-- product-media:start -->
 
-Product media will be inserted by the validated capture pipeline in Phase 4.
+Automated product-media capture is not part of the v1.0 release gate.
 
 <!-- product-media:end -->
 
@@ -101,13 +101,13 @@ All example customers, devices, serial numbers and attachments are fictional or 
 
 ## Delivery stages
 
-| Stage   | Purpose                                                          | Status      |
-| ------- | ---------------------------------------------------------------- | ----------- |
-| Phase 0 | Product definition, design direction and repository governance   | Complete    |
-| Phase 1 | Platform foundation, backend, identity and shared contracts      | Complete    |
-| Phase 2 | Desktop and mobile repair workflows                              | Complete    |
-| Phase 3 | Offline synchronisation, reliability, security and observability | Complete    |
-| Phase 4 | Packaging, automated product media and the v1.0 release          | In progress |
+| Stage   | Purpose                                                          | Status   |
+| ------- | ---------------------------------------------------------------- | -------- |
+| Phase 0 | Product definition, design direction and repository governance   | Complete |
+| Phase 1 | Platform foundation, backend, identity and shared contracts      | Complete |
+| Phase 2 | Desktop and mobile repair workflows                              | Complete |
+| Phase 3 | Offline synchronisation, reliability, security and observability | Complete |
+| Phase 4 | Cross-platform packaging and the v1.0 release                    | Complete |
 
 ## Licence
 

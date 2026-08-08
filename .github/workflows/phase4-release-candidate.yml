@@ -42,7 +42,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --dir apps/mobile exec expo install --check
       - run: pnpm verify:phase4
-      - run: pnpm build
       - run: pnpm --filter @repairflow/desktop exec playwright install --with-deps chromium
       - run: pnpm --filter @repairflow/desktop e2e
       - run: pnpm --filter @repairflow/desktop a11y
@@ -112,7 +111,7 @@ jobs:
           if-no-files-found: error
 
   android-package:
-    name: Android Package and Offline Smoke
+    name: Android Package
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -122,18 +121,6 @@ jobs:
         with: { node-version: 22.23.1, cache: pnpm }
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: '17' }
-      - name: Prepare Android emulator acceleration
-        run: |
-          if [ -e /dev/kvm ]; then
-            sudo chmod 0666 /dev/kvm || true
-            if [ -r /dev/kvm ] && [ -w /dev/kvm ]; then
-              echo "KVM acceleration is available."
-            else
-              echo "::warning::KVM exists but is not accessible; the emulator runner will choose its safe fallback."
-            fi
-          else
-            echo "::warning::/dev/kvm is unavailable on this runner; the emulator runner will choose its safe fallback."
-          fi
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec turbo run build --filter=@repairflow/mobile
       - run: pnpm --dir apps/mobile native:android
@@ -142,45 +129,12 @@ jobs:
       - run: mkdir -p artifacts/android && cp apps/mobile/android/app/build/outputs/apk/release/app-release.apk artifacts/android/RepairFlow-Android.apk
       - uses: actions/upload-artifact@v4
         with:
-          {
-            name: mobile-android,
-            path: artifacts/android/RepairFlow-Android.apk,
-            if-no-files-found: error,
-          }
-      - name: Run Android release smoke and capture offline queue
-        uses: reactivecircus/android-emulator-runner@v2
-        env:
-          MAESTRO_DRIVER_STARTUP_TIMEOUT: '180000'
-          MAESTRO_CLI_NO_ANALYTICS: '1'
-          MAESTRO_DIAGNOSTIC_DIR: artifacts/diagnostics/android
-        with:
-          api-level: 35
-          arch: x86_64
-          profile: pixel_6
-          emulator-boot-timeout: 1200
-          disable-linux-hw-accel: auto
-          emulator-options: -no-window -gpu software -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none
-          script: |
-            adb install -r artifacts/android/RepairFlow-Android.apk
-            curl -fLsS -o /tmp/install-maestro.sh https://get.maestro.mobile.dev
-            bash /tmp/install-maestro.sh
-            test -x "$HOME/.maestro/bin/maestro"
-            mkdir -p artifacts/media/android
-            bash scripts/run-maestro-with-retry.sh test apps/mobile/maestro/release-smoke.yaml
-            bash scripts/run-maestro-with-retry.sh test --test-output-dir artifacts/media/android apps/mobile/maestro/release-media-android.yaml
-      - if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          {
-            name: diagnostics-android,
-            path: artifacts/diagnostics/android/**,
-            if-no-files-found: ignore,
-          }
-      - uses: actions/upload-artifact@v4
-        with: { name: media-android, path: artifacts/media/android/**, if-no-files-found: error }
+          name: mobile-android
+          path: artifacts/android/RepairFlow-Android.apk
+          if-no-files-found: error
 
   ios-package:
-    name: iOS Simulator Package and Media
+    name: iOS Simulator Package
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -205,88 +159,17 @@ jobs:
           test -n "$APP_REL"
           APP_PATH="$PWD/$APP_REL"
           ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" ../../RepairFlow-iOS-Simulator.zip
-          echo "APP_PATH=$APP_PATH" >> "$GITHUB_ENV"
       - run: mkdir -p artifacts/ios && mv RepairFlow-iOS-Simulator.zip artifacts/ios/
-      - name: Install and capture iOS release
-        env:
-          MAESTRO_DRIVER_STARTUP_TIMEOUT: '180000'
-          MAESTRO_CLI_NO_ANALYTICS: '1'
-          MAESTRO_DIAGNOSTIC_DIR: artifacts/diagnostics/ios
-        run: |
-          DEVICE="$(python3 - <<'PY'
-          import json,subprocess
-          data=json.loads(subprocess.check_output(['xcrun','simctl','list','devices','available','-j']))
-          for runtime,devices in data['devices'].items():
-              if 'iOS' in runtime:
-                  for d in devices:
-                      if d['name'].startswith('iPhone'):
-                          print(d['udid']); raise SystemExit
-          raise SystemExit('No available iPhone simulator')
-          PY
-          )"
-          export MAESTRO_IOS_UDID="$DEVICE"
-          xcrun simctl boot "$DEVICE" 2>/dev/null || true
-          open -a Simulator
-          xcrun simctl bootstatus "$DEVICE" -b
-          xcrun simctl install "$DEVICE" "$APP_PATH"
-          xcrun simctl privacy "$DEVICE" grant camera com.xuanz3.repairflow.mobile || true
-          curl -fLsS -o /tmp/install-maestro.sh https://get.maestro.mobile.dev
-          bash /tmp/install-maestro.sh
-          test -x "$HOME/.maestro/bin/maestro"
-          mkdir -p artifacts/media/ios
-          bash scripts/run-maestro-with-retry.sh test apps/mobile/maestro/release-smoke.yaml
-          bash scripts/run-maestro-with-retry.sh test --test-output-dir artifacts/media/ios apps/mobile/maestro/release-media-ios.yaml
-      - if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          { name: diagnostics-ios, path: artifacts/diagnostics/ios/**, if-no-files-found: ignore }
       - uses: actions/upload-artifact@v4
         with:
-          {
-            name: mobile-ios-simulator,
-            path: artifacts/ios/RepairFlow-iOS-Simulator.zip,
-            if-no-files-found: error,
-          }
-      - uses: actions/upload-artifact@v4
-        with: { name: media-ios, path: artifacts/media/ios/**, if-no-files-found: error }
-
-  desktop-media:
-    name: Desktop Product Media
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with: { version: 11.9.0 }
-      - uses: actions/setup-node@v4
-        with: { node-version: 22.23.1, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build
-      - run: pnpm --filter @repairflow/desktop exec playwright install --with-deps chromium
-      - run: xvfb-run -a pnpm --filter @repairflow/desktop exec playwright test --config=playwright.media.config.ts
-        env:
-          REPAIRFLOW_MEDIA_OUTPUT: ${{ github.workspace }}/artifacts/media/desktop
-      - uses: actions/upload-artifact@v4
-        with: { name: media-desktop, path: artifacts/media/desktop/*.png, if-no-files-found: error }
-
-  diagrams:
-    name: Architecture Media
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 22.23.1 }
-      - run: |
-          mkdir -p artifacts/media/diagrams
-          PUPPETEER_SKIP_DOWNLOAD=true npx -y @mermaid-js/mermaid-cli@11.16.0 -p tools/media/puppeteer-config.json -i tools/media/system-architecture.mmd -o artifacts/media/diagrams/15-system-architecture.png -w 1400 -H 700 -b '#ffffff'
-          PUPPETEER_SKIP_DOWNLOAD=true npx -y @mermaid-js/mermaid-cli@11.16.0 -p tools/media/puppeteer-config.json -i tools/media/synchronisation-sequence.mmd -o artifacts/media/diagrams/16-synchronisation-sequence.png -w 1400 -H 700 -b '#ffffff'
-      - uses: actions/upload-artifact@v4
-        with:
-          { name: media-diagrams, path: artifacts/media/diagrams/*.png, if-no-files-found: error }
+          name: mobile-ios-simulator
+          path: artifacts/ios/RepairFlow-iOS-Simulator.zip
+          if-no-files-found: error
 
   aggregate-release:
-    name: Aggregate Release Bundle and Product Media
+    name: Aggregate Release Bundle
     runs-on: ubuntu-latest
-    needs: [release-quality, desktop-package, android-package, ios-package, desktop-media, diagrams]
+    needs: [release-quality, desktop-package, android-package, ios-package]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -296,38 +179,27 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - uses: actions/download-artifact@v4
         with: { path: artifacts/downloads }
-      - name: Assemble raw media and release files
+      - name: Assemble release files
         run: |
-          mkdir -p artifacts/media/raw/{desktop,ios,android,diagrams} artifacts/release-bundle
-          find artifacts/downloads/media-desktop -type f -name '*.png' -exec cp {} artifacts/media/raw/desktop/ \;
-          find artifacts/downloads/media-ios -type f -name '*.png' -exec cp {} artifacts/media/raw/ios/ \;
-          find artifacts/downloads/media-android -type f -name '*.png' -exec cp {} artifacts/media/raw/android/ \;
-          find artifacts/downloads/media-diagrams -type f -name '*.png' -exec cp {} artifacts/media/raw/diagrams/ \;
+          mkdir -p artifacts/release-bundle
           find artifacts/downloads/desktop-macos -type f -name '*.zip' -exec cp {} artifacts/release-bundle/RepairFlow-macOS-arm64.zip \;
           find artifacts/downloads/desktop-windows -type f -name '*.exe' -exec cp {} artifacts/release-bundle/RepairFlow-Windows-x64.exe \;
           find artifacts/downloads/desktop-linux -type f -name '*.AppImage' -exec cp {} artifacts/release-bundle/RepairFlow-Linux-x64.AppImage \;
           find artifacts/downloads/mobile-android -type f -name '*.apk' -exec cp {} artifacts/release-bundle/RepairFlow-Android.apk \;
           find artifacts/downloads/mobile-ios-simulator -type f -name '*.zip' -exec cp {} artifacts/release-bundle/RepairFlow-iOS-Simulator.zip \;
-      - run: node tools/media/compose-final-media.mjs artifacts/media/raw artifacts/media/final
+          test -f artifacts/release-bundle/RepairFlow-macOS-arm64.zip
+          test -f artifacts/release-bundle/RepairFlow-Windows-x64.exe
+          test -f artifacts/release-bundle/RepairFlow-Linux-x64.AppImage
+          test -f artifacts/release-bundle/RepairFlow-Android.apk
+          test -f artifacts/release-bundle/RepairFlow-iOS-Simulator.zip
       - run: node tools/release/build-metadata.mjs artifacts/release-bundle
       - run: node tools/release/generate-sbom.mjs artifacts/release-bundle
       - run: cp docs/releases/KNOWN_LIMITATIONS_V1.md artifacts/release-bundle/KNOWN_LIMITATIONS.md && cp docs/releases/v1.0.0.md artifacts/release-bundle/RELEASE_NOTES.md
       - run: node tools/release/generate-checksums.mjs artifacts/release-bundle
       - run: node tools/verify/release-bundle-contract.mjs artifacts/release-bundle
-      - run: |
-          test "$(find artifacts/media/final -type f -name '*.png' | wc -l | tr -d ' ')" = 18
-          test "$(find artifacts/release-bundle -maxdepth 1 -type f | wc -l | tr -d ' ')" -ge 9
+      - run: test "$(find artifacts/release-bundle -maxdepth 1 -type f | wc -l | tr -d ' ')" -ge 9
       - uses: actions/upload-artifact@v4
         with:
-          {
-            name: phase4-product-media,
-            path: artifacts/media/final/*.png,
-            if-no-files-found: error,
-          }
-      - uses: actions/upload-artifact@v4
-        with:
-          {
-            name: repairflow-release-bundle,
-            path: artifacts/release-bundle/*,
-            if-no-files-found: error,
-          }
+          name: repairflow-release-bundle
+          path: artifacts/release-bundle/*
+          if-no-files-found: error

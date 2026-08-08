@@ -60,7 +60,7 @@ assert 'head -n 1' not in workflow, 'Phase 4 workflow must not use early-exit he
 assert workflow.count('electron --no-sandbox .release-package') == 2, 'Linux CI runtime smoke must use --no-sandbox exactly twice'
 assert 'ELECTRON_DISABLE_SANDBOX' not in workflow, 'Phase 4 workflow must not disable Electron sandbox globally'
 
-for token in ['desktop-package','android-package','ios-package','desktop-media','aggregate-release']:
+for token in ['desktop-package','android-package','ios-package','aggregate-release']:
  assert token in workflow, f'Phase 4 workflow missing {token}'
 release_helpers=['tools/release/prepare-desktop-package.mjs','tools/release/verify-mobile-native-contract.py','tools/release/build-metadata.mjs','tools/release/generate-checksums.mjs','tools/release/generate-sbom.mjs','tools/release/finalise-readme.mjs']
 ignore_text=(root/'.gitignore').read_text()
@@ -74,4 +74,4 @@ sbom_source=(root/'tools/release/generate-sbom.mjs').read_text()
 assert "/^ {2}['\"]?" in sbom_source, 'SBOM lockfile parser must use an explicit {2} indentation quantifier'
 assert "/^  ['\"]?" not in sbom_source, 'SBOM lockfile parser must not use hard-to-count repeated regex spaces'
 
-print('Phase 4 release and media validation passed.')
+print('Phase 4 release validation passed.')

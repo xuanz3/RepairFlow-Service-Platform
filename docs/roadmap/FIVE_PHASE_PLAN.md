@@ -28,9 +28,9 @@ Durable outbox, idempotency, delta pull, tombstones, conflicts, interrupted uplo
 Expected focused commits: 20-30  
 Releases: `v0.5.0-offline-workflows`, `v0.6.0-reliability`
 
-## Phase 4 - Packaging Product Media and v1.0
+## Phase 4 - Packaging and v1.0
 
-Cross-platform packages, checksums, SBOM, deterministic captures, README media insertion, installation and accessibility checks, release candidates and v1.0.0.
+Cross-platform packages, checksums, SBOM, installation and accessibility checks, release candidates and v1.0.0. Automated product-media capture is optional and is not a release gate.
 
 Expected focused commits: 14-22  
 Releases: `v0.9.0-rc.1`, later release candidates when needed, `v1.0.0`
