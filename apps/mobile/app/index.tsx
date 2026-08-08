@@ -34,7 +34,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.screen}>
+    <SafeAreaView testID="mobile-home" style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.rowBetween}>
           <View style={[styles.header, { flex: 1 }]}>
@@ -64,6 +64,7 @@ export default function HomeScreen() {
               <Text style={styles.primaryButtonText}>New intake</Text>
             </Pressable>
             <Pressable
+              testID="mobile-scan-qr"
               style={[styles.secondaryButton, { flex: 1 }]}
               onPress={() => router.push('/scan')}
             >
@@ -94,6 +95,7 @@ export default function HomeScreen() {
 
         {cases.map((item) => (
           <Pressable
+            testID={`mobile-case-${item.id}`}
             style={styles.card}
             key={item.id}
             onPress={() => router.push({ pathname: '/case/[id]', params: { id: item.id } })}
@@ -103,7 +105,10 @@ export default function HomeScreen() {
                 <Text style={styles.cardTitle}>
                   {item.device.manufacturer} {item.device.model}
                 </Text>
-                <Text style={styles.cardCopy}>
+                <Text
+                  testID={customerQueueTestId(item.customerDisplayName)}
+                  style={styles.cardCopy}
+                >
                   {item.reference} · {item.customerDisplayName}
                 </Text>
               </View>
@@ -119,7 +124,10 @@ export default function HomeScreen() {
           </View>
         )}
 
-        <View style={[styles.card, { backgroundColor: '#16241f' }]}>
+        <View
+          testID="mobile-local-queue-protected"
+          style={[styles.card, { backgroundColor: '#16241f' }]}
+        >
           <Text style={[styles.cardTitle, styles.success]}>Local queue protected</Text>
           <Text style={styles.cardCopy}>
             SQLite uses WAL mode. Evidence files are copied into application storage and hashed.
@@ -128,4 +136,13 @@ export default function HomeScreen() {
       </ScrollView>
     </SafeAreaView>
   );
+}
+
+function customerQueueTestId(customerDisplayName: string): string {
+  const segment = customerDisplayName
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return `mobile-case-customer-${segment || 'unknown'}`;
 }

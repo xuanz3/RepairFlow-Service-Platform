@@ -2,7 +2,7 @@
   "expo": {
     "name": "RepairFlow",
     "slug": "repairflow-mobile",
-    "version": "0.4.0",
+    "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "repairflow",
     "userInterfaceStyle": "automatic",

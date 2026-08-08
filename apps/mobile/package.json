@@ -1,6 +1,6 @@
 {
   "name": "@repairflow/mobile",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "private": true,
   "main": "expo-router/entry",
   "scripts": {
@@ -10,7 +10,11 @@
     "ios": "expo start --ios",
     "start": "expo start",
     "test": "vitest run",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "native:android": "expo prebuild --platform android --clean --no-install",
+    "native:ios": "expo prebuild --platform ios --clean --no-install",
+    "package:android": "pnpm native:android && cd android && ./gradlew assembleRelease",
+    "package:ios-simulator": "pnpm native:ios"
   },
   "dependencies": {
     "@expo/log-box": "55.0.13",

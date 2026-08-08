@@ -1,0 +1,57 @@
+appId: com.xuanz3.repairflow.mobile
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible:
+      id: 'mobile-home'
+    timeout: 60000
+- takeScreenshot: '08-mobile-work-queue'
+- tapOn:
+    id: 'mobile-new-intake'
+- assertVisible: 'New repair intake'
+- takeScreenshot: '09-mobile-device-check-in'
+- scrollUntilVisible:
+    element:
+      id: 'intake-condition'
+    direction: DOWN
+- tapOn:
+    id: 'intake-condition'
+- inputText: 'No visible impact damage; intake condition recorded locally.'
+- hideKeyboard
+- takeScreenshot: '11-mobile-condition-capture'
+- tapOn:
+    id: 'mobile-route-back'
+- extendedWaitUntil:
+    visible:
+      id: 'mobile-home'
+    timeout: 30000
+- tapOn:
+    id: 'mobile-scan-qr'
+- assertVisible: 'MANUAL FALLBACK'
+- takeScreenshot: '10-mobile-qr-lookup'
+- tapOn:
+    id: 'mobile-route-back'
+- extendedWaitUntil:
+    visible:
+      id: 'mobile-home'
+    timeout: 30000
+- tapOn:
+    id: 'mobile-case-018f0a9b-4b55-7d62-9d10-11c359f9f202'
+- tapOn:
+    id: 'mobile-capture-evidence'
+- assertVisible: 'EVIDENCE NOTE'
+- tapOn: 'What does this photo show?'
+- inputText: 'Lower edge condition before service.'
+- hideKeyboard
+- takeScreenshot: '12-mobile-annotation'
+- tapOn:
+    id: 'mobile-route-back'
+- extendedWaitUntil:
+    visible:
+      id: 'mobile-tab-diagnosis'
+    timeout: 30000
+- tapOn:
+    id: 'mobile-tab-diagnosis'
+- assertVisible: 'DIAGNOSIS SUMMARY'
+- takeScreenshot: '13-mobile-diagnosis'

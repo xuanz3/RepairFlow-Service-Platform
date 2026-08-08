@@ -1,0 +1,20 @@
+sequenceDiagram
+  participant C as Offline client
+  participant O as Durable outbox
+  participant A as RepairFlow API
+  participant D as PostgreSQL
+  C->>O: Commit local operation + stable operationId
+  O->>A: Replay mutation with expected version
+  A->>D: Check idempotency journal and entity version
+  alt already applied
+    D-->>A: Previous result
+    A-->>O: Idempotent replay result
+  else conflict
+    D-->>A: Current version + changed fields
+    A-->>O: Explicit conflict
+  else accepted
+    A->>D: Atomic mutation + sync change
+    A-->>O: Result + cursor
+  end
+  O->>A: Delta pull after cursor
+  A-->>C: Changes + tombstones + next cursor

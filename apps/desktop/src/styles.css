@@ -460,7 +460,7 @@ kbd {
 
 .case-primary span {
   overflow: hidden;
-  color: #7d899d;
+  color: #8793a7;
   font-size: 10px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -505,7 +505,7 @@ kbd {
 .priority {
   grid-area: priority;
   justify-self: end;
-  color: #6f7a8d;
+  color: #8a96aa;
   font-size: 9px;
   text-transform: capitalize;
 }

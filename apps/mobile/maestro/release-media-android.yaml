@@ -1,0 +1,17 @@
+appId: com.xuanz3.repairflow.mobile
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible:
+      id: 'mobile-home'
+    timeout: 90000
+- setAirplaneMode: enabled
+- scrollUntilVisible:
+    element:
+      id: 'mobile-local-queue-protected'
+    direction: DOWN
+- assertVisible:
+    id: 'mobile-local-queue-protected'
+- takeScreenshot: '14-mobile-offline-queue'
+- setAirplaneMode: disabled

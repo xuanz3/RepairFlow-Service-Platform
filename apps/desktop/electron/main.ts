@@ -122,6 +122,20 @@ function mimeTypeFor(extension: string): string {
 }
 
 app.whenReady().then(() => {
+  if (process.env.REPAIRFLOW_RUNTIME_SMOKE === '1') {
+    const smokePath =
+      process.env.REPAIRFLOW_RUNTIME_SMOKE_PATH ??
+      path.join(app.getPath('temp'), `repairflow-runtime-smoke-${process.pid}.sqlite`);
+    const smokeStore = new LocalWorkflowStore(smokePath);
+    const cases = smokeStore.list();
+    smokeStore.close();
+    if (cases.length < 1)
+      throw new Error('Packaged runtime smoke did not load deterministic workflow data.');
+    console.log(`RepairFlow desktop runtime smoke passed with ${cases.length} cases.`);
+    app.quit();
+    return;
+  }
+
   store = new LocalWorkflowStore(path.join(app.getPath('userData'), 'repairflow-workflows.sqlite'));
   syncStore = new DurableSyncStore(path.join(app.getPath('userData'), 'repairflow-sync.sqlite'));
   registerWorkflowIpc(store);
