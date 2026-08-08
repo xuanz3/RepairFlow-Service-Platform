@@ -33,6 +33,16 @@ appId: com.xuanz3.repairflow.mobile
 - tapOn:
     id: 'save-intake'
 - assertVisible: 'Release Verification'
+- back
+- assertVisible: 'Workshop intake'
+- scrollUntilVisible:
+    element: 'Release Verification'
+    direction: DOWN
+- assertVisible: 'Release Verification'
 - stopApp
 - launchApp
+- assertVisible: 'Workshop intake'
+- scrollUntilVisible:
+    element: 'Release Verification'
+    direction: DOWN
 - assertVisible: 'Release Verification'

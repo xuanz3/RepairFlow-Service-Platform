@@ -122,6 +122,13 @@ jobs:
         with: { node-version: 22.23.1, cache: pnpm }
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: '17' }
+      - name: Enable KVM acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          test -r /dev/kvm
+          test -w /dev/kvm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec turbo run build --filter=@repairflow/mobile
       - run: pnpm --dir apps/mobile native:android
@@ -137,18 +144,22 @@ jobs:
           }
       - name: Run Android release smoke and capture offline queue
         uses: reactivecircus/android-emulator-runner@v2
+        env:
+          MAESTRO_DRIVER_STARTUP_TIMEOUT: '180000'
+          MAESTRO_CLI_NO_ANALYTICS: '1'
         with:
           api-level: 35
           arch: x86_64
           profile: pixel_6
+          emulator-boot-timeout: 1200
           script: |
             adb install -r artifacts/android/RepairFlow-Android.apk
             curl -fLsS -o /tmp/install-maestro.sh https://get.maestro.mobile.dev
             bash /tmp/install-maestro.sh
             test -x "$HOME/.maestro/bin/maestro"
             mkdir -p artifacts/media/android
-            "$HOME/.maestro/bin/maestro" test apps/mobile/maestro/release-smoke.yaml
-            "$HOME/.maestro/bin/maestro" test --test-output-dir artifacts/media/android apps/mobile/maestro/release-media-android.yaml
+            bash scripts/run-maestro-with-retry.sh test apps/mobile/maestro/release-smoke.yaml
+            bash scripts/run-maestro-with-retry.sh test --test-output-dir artifacts/media/android apps/mobile/maestro/release-media-android.yaml
       - uses: actions/upload-artifact@v4
         with: { name: media-android, path: artifacts/media/android/**, if-no-files-found: error }
 
@@ -181,6 +192,9 @@ jobs:
           echo "APP_PATH=$APP_PATH" >> "$GITHUB_ENV"
       - run: mkdir -p artifacts/ios && mv RepairFlow-iOS-Simulator.zip artifacts/ios/
       - name: Install and capture iOS release
+        env:
+          MAESTRO_DRIVER_STARTUP_TIMEOUT: '180000'
+          MAESTRO_CLI_NO_ANALYTICS: '1'
         run: |
           DEVICE="$(python3 - <<'PY'
           import json,subprocess
@@ -202,8 +216,8 @@ jobs:
           bash /tmp/install-maestro.sh
           test -x "$HOME/.maestro/bin/maestro"
           mkdir -p artifacts/media/ios
-          "$HOME/.maestro/bin/maestro" test apps/mobile/maestro/release-smoke.yaml
-          "$HOME/.maestro/bin/maestro" test --test-output-dir artifacts/media/ios apps/mobile/maestro/release-media-ios.yaml
+          bash scripts/run-maestro-with-retry.sh test apps/mobile/maestro/release-smoke.yaml
+          bash scripts/run-maestro-with-retry.sh test --test-output-dir artifacts/media/ios apps/mobile/maestro/release-media-ios.yaml
       - uses: actions/upload-artifact@v4
         with:
           {
